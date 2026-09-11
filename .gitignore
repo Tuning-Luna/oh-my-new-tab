@@ -1,0 +1,5 @@
+# Vite dev-server cache, created when the page is previewed with `vite`.
+# Must not be committed, and must not end up in the packed extension.
+.vite/
+
+node_modules/
