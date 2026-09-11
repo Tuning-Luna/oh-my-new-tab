@@ -25,7 +25,7 @@
   /* ---- background ---- */
 
   /* Background blur radius. Set to 0px to turn the blur off entirely. */
-  --bg-blur: 16px;
+  --bg-blur: 10px;
 
   /* Dark scrim drawn over the photo. The bundled shot is a high-contrast
    * black-and-white frame with very bright areas, and white text is unreadable
@@ -103,6 +103,7 @@
 
 * {
   box-sizing: border-box;
+  user-select: none;
 }
 
 body {
@@ -151,8 +152,8 @@ body {
 
 .clock {
   font-family: var(--font-clock);
-  font-size: clamp(3.5rem, 10vw, 7.5rem);
-  font-weight: 300;
+  font-size: clamp(4.5rem, 13vw, 9.5rem);
+  font-weight: 400;
   line-height: 1;
   letter-spacing: 0.01em;
   /* Tabular figures give every digit the same width, so the clock does not
@@ -165,8 +166,8 @@ body {
 .date {
   margin: 0.85rem 0 0;
   font-family: var(--font-clock);
-  font-size: clamp(0.95rem, 1.8vw, 1.3rem);
-  font-weight: 300;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 350;
   letter-spacing: 0.06em;
   color: var(--fg-muted);
   text-shadow: var(--text-shadow);
