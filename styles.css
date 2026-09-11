@@ -1,0 +1,127 @@
+/* ===========================================================================
+ * Tunables — everything you are likely to want to change lives in this block.
+ * ======================================================================== */
+
+:root {
+  /* Background blur radius. Set to 0px to turn the blur off entirely. */
+  --bg-blur: 16px;
+
+  /* Dark scrim drawn over the photo. The bundled shot is a high-contrast
+   * black-and-white frame with very bright areas, and white text is unreadable
+   * on it without this. Set to `transparent` to remove the scrim.
+   * Note: rgba() rather than a hex colour, so it stays readable with an alpha. */
+  --bg-scrim: rgba(0, 0, 0, 0.38);
+
+  /* Fallback colour painted until the photo finishes decoding, so the page
+   * never flashes white on open. */
+  --bg-base: #101014;
+
+  --fg: #ffffff;
+  --fg-muted: rgba(255, 255, 255, 0.78);
+  --text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* ===========================================================================
+ * Background
+ * ======================================================================== */
+
+.bg {
+  position: fixed;
+  /* Overscan by twice the blur radius, so the soft transparent fringe that
+   * `filter: blur()` produces at the edges falls outside the viewport instead
+   * of showing as a washed-out border. */
+  inset: calc(-2 * var(--bg-blur));
+  z-index: 0;
+  pointer-events: none;
+
+  /* First layer on top: the scrim. Second layer: the photo. The scrim is a
+   * flat colour, so blurring it changes nothing — it only softens the photo. */
+  background-image: linear-gradient(var(--bg-scrim), var(--bg-scrim)),
+    url("assets/JSA.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  filter: blur(var(--bg-blur));
+}
+
+/* ===========================================================================
+ * Layout
+ * ======================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--bg-base);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  /* `margin: auto` centres the block on both axes. Preferred over
+   * `align-items: center`, which pushes overflowing content out of reach at
+   * the top of the page. */
+  margin: auto;
+  position: relative; /* required for z-index to lift it above .bg */
+  z-index: 1;
+
+  max-width: 52rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+/* ===========================================================================
+ * Content
+ * ======================================================================== */
+
+.clock {
+  font-size: clamp(3.5rem, 11vw, 8rem);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  /* Tabular figures give every digit the same width, so the clock does not
+   * jitter sideways as the seconds change. */
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--text-shadow);
+}
+
+.date {
+  margin: 0.85rem 0 0;
+  font-size: clamp(0.95rem, 1.8vw, 1.3rem);
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  text-shadow: var(--text-shadow);
+}
+
+.phrase {
+  margin: 2.75rem 0 0;
+  font-size: clamp(1rem, 1.9vw, 1.4rem);
+  color: var(--fg-muted);
+  text-shadow: var(--text-shadow);
+}
+
+.quote {
+  margin: 1.75rem 0 0;
+}
+
+.quote__content {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.1vw, 1.5rem);
+  line-height: 1.7;
+  text-shadow: var(--text-shadow);
+}
+
+.quote__author {
+  margin-top: 0.6rem;
+  font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  text-shadow: var(--text-shadow);
+}

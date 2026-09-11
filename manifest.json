@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "oh-my-new-tab",
+  "version": "1.0.0",
+  "description": "A minimal new tab page: clock, date, a random phrase and a random quote over a blurred background.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
+}
