@@ -17,13 +17,21 @@
     <!-- Background photo and scrim. Purely decorative. -->
     <div class="bg" aria-hidden="true"></div>
 
+    <!--
+      Each .slot is positioned independently against the viewport height; see
+      the layout block in styles.css. Keeping them as siblings rather than as
+      one stacked column is what lets the phrase sit dead centre while the
+      quote sits between it and the bottom edge.
+    -->
     <main class="stage">
-      <div class="clock" id="clock">--:--:--</div>
-      <p class="date" id="date"></p>
+      <div class="slot slot--head">
+        <div class="clock" id="clock">--:--:--</div>
+        <p class="date" id="date"></p>
+      </div>
 
-      <p class="phrase" id="phrase"></p>
+      <p class="slot slot--phrase" id="phrase"></p>
 
-      <figure class="quote">
+      <figure class="slot slot--quote">
         <blockquote class="quote__content" id="quote-content"></blockquote>
         <figcaption class="quote__author" id="quote-author"></figcaption>
       </figure>

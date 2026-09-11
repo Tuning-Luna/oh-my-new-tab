@@ -3,27 +3,55 @@
  * ======================================================================== */
 
 :root {
+  /* ---- background ---- */
+
   /* Background blur radius. Set to 0px to turn the blur off entirely. */
   --bg-blur: 16px;
 
   /* Dark scrim drawn over the photo. The bundled shot is a high-contrast
    * black-and-white frame with very bright areas, and white text is unreadable
-   * on it without this. Set to `transparent` to remove the scrim.
-   * Note: rgba() rather than a hex colour, so it stays readable with an alpha. */
+   * on it without this. Set to `transparent` to remove the scrim. */
   --bg-scrim: rgba(0, 0, 0, 0.38);
 
   /* Fallback colour painted until the photo finishes decoding, so the page
    * never flashes white on open. */
   --bg-base: #101014;
 
-  /* How far to lift the whole stack above the geometric centre of the
-   * viewport. Purely optical: the content stays centred by `margin: auto`,
-   * this only nudges where that centre sits. Set to 0vh to remove it. */
-  --stage-lift: 8vh;
-
   --fg: #ffffff;
   --fg-muted: rgba(255, 255, 255, 0.78);
   --text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+
+  /* ---- type ----
+   * "Segoe UI Variable Display" is the optical size Microsoft ships for large
+   * text on Windows 11; the plain "Segoe UI" faces cover Windows 10 and the
+   * system stack covers everything else.
+   *
+   * The clock deliberately avoids every other proportional face on this
+   * machine. Corbel, Candara, Georgia and Franklin Gothic all lack the `tnum`
+   * OpenType feature, so `font-variant-numeric: tabular-nums` silently does
+   * nothing for them and the clock resizes by ~11-14px whenever a digit
+   * changes. Segoe UI honours it. Verify before swapping this. */
+  --font-clock: "Segoe UI Variable Display", "Segoe UI", system-ui,
+    -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  /* Chinese quotes need a face that actually contains CJK glyphs. A Latin
+   * serif listed first (Georgia, Constantia, Sitka) does not, and the Chinese
+   * is silently substituted from a fallback face instead — which is why this
+   * stack leads with real CJK fonts and ends in the generic serif. */
+  --font-quote: KaiTi, SimSun, "Songti SC", "Source Han Serif SC",
+    "Noto Serif SC", STSong, serif;
+
+  /* ---- vertical placement ----
+   * Each slot is centred on its own share of the viewport height, so the three
+   * blocks are positioned independently rather than stacked. */
+  --head-y: 25%;
+  --phrase-y: 50%;
+  --quote-y: 75%;
+
+  /* Widest a slot may grow before its text wraps. */
+  --slot-width: min(92vw, 78rem);
 }
 
 /* ===========================================================================
@@ -61,26 +89,41 @@
 body {
   margin: 0;
   min-height: 100vh;
-  display: flex;
   background-color: var(--bg-base);
   color: var(--fg);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
 
 .stage {
-  /* `margin: auto` centres the block on both axes. Preferred over
-   * `align-items: center`, which pushes overflowing content out of reach at
-   * the top of the page. */
-  margin: auto;
-  position: relative; /* required for z-index to lift it above .bg */
-  top: calc(-1 * var(--stage-lift)); /* relative offset: layout is untouched */
-  z-index: 1;
+  position: relative;
+  /* The slots below are placed with percentages, which resolve against this
+   * box. Keep it a full viewport tall, with a floor so the three slots cannot
+   * collide on a short window — below that the page scrolls instead. */
+  min-height: max(100vh, 40rem);
+}
 
-  max-width: 52rem;
-  padding: 2rem 1.5rem;
+.slot {
+  position: absolute;
+  left: 50%;
+  /* Centres the block on the point given by its `top`, so `top` names the
+   * centre of the block rather than its top edge. */
+  transform: translate(-50%, -50%);
+  width: var(--slot-width);
   text-align: center;
+}
+
+.slot--head {
+  top: var(--head-y);
+}
+
+.slot--phrase {
+  top: var(--phrase-y);
+}
+
+.slot--quote {
+  top: var(--quote-y);
+  margin: 0;
 }
 
 /* ===========================================================================
@@ -88,44 +131,53 @@ body {
  * ======================================================================== */
 
 .clock {
-  font-size: clamp(3.5rem, 11vw, 8rem);
-  font-weight: 200;
+  font-family: var(--font-clock);
+  font-size: clamp(3.5rem, 10vw, 7.5rem);
+  font-weight: 300;
   line-height: 1;
   letter-spacing: 0.01em;
   /* Tabular figures give every digit the same width, so the clock does not
-   * jitter sideways as the seconds change. */
+   * jitter sideways as the seconds change. Only honoured by fonts that carry
+   * the `tnum` feature — see --font-clock. */
   font-variant-numeric: tabular-nums;
   text-shadow: var(--text-shadow);
 }
 
 .date {
   margin: 0.85rem 0 0;
+  font-family: var(--font-clock);
   font-size: clamp(0.95rem, 1.8vw, 1.3rem);
+  font-weight: 300;
   letter-spacing: 0.06em;
   color: var(--fg-muted);
   text-shadow: var(--text-shadow);
 }
 
-.phrase {
-  margin: 2.75rem 0 0;
-  font-size: clamp(1.2rem, 2.3vw, 1.75rem);
+/* Paired with the positioning rule of the same name in the layout section —
+ * this element is its own slot, so the two rules target one element. */
+.slot--phrase {
+  margin: 0;
+  font-size: clamp(1.75rem, 4.6vw, 5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--fg-muted);
+  /* Even out the line lengths when the phrase wraps. */
+  text-wrap: balance;
   text-shadow: var(--text-shadow);
-}
-
-.quote {
-  margin: 1.75rem 0 0;
 }
 
 .quote__content {
   margin: 0;
+  font-family: var(--font-quote);
   font-size: clamp(1.3rem, 2.7vw, 2rem);
   line-height: 1.7;
+  text-wrap: balance;
   text-shadow: var(--text-shadow);
 }
 
 .quote__author {
   margin-top: 0.6rem;
+  font-family: var(--font-quote);
   font-size: clamp(1rem, 1.8vw, 1.35rem);
   letter-spacing: 0.04em;
   color: var(--fg-muted);
