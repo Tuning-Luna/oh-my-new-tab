@@ -2,10 +2,9 @@
 /**
  * Random phrase and random quote, read from the JSON files in data/.
  *
- * Both files are fetched through chrome.runtime.getURL(). This page is served
- * from the extension's own origin, so these are same-origin reads: they need
- * neither `web_accessible_resources` (which only governs access from *other*
- * origins) nor `host_permissions`.
+ * Both files are fetched from the extension's own origin, so these are
+ * same-origin reads: they need neither `web_accessible_resources` (which only
+ * governs access from *other* origins) nor `host_permissions`.
  *
  * Results are written with textContent, never innerHTML, so whatever is put
  * into the JSON files is rendered as literal text and cannot inject markup.
@@ -16,9 +15,20 @@ const QUOTES_PATH = "data/quotes.json";
 
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
 
+/**
+ * Resolves a packaged resource to a URL.
+ *
+ * chrome.runtime.getURL() resolves the path against the extension root, and
+ * this page is itself served from that root - so a plain relative URL resolves
+ * to the very same address. Falling back to it keeps the page renderable under
+ * a plain static server such as `vite`, where the extension APIs do not exist.
+ */
+const resolveResource = (path) =>
+  globalThis.chrome?.runtime?.getURL ? chrome.runtime.getURL(path) : path;
+
 /** Reads a packaged JSON file and asserts that it holds an array. */
 async function loadJsonArray(path) {
-  const response = await fetch(chrome.runtime.getURL(path));
+  const response = await fetch(resolveResource(path));
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} ${response.statusText}`);
   }

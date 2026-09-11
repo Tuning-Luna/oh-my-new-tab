@@ -85,6 +85,21 @@ oh-my-new-tab/
 
 扩展只跑在 Chrome 上，WebP 支持没有任何顾虑。若要换，把图片转成 `assets/JSA.webp` 并同步修改 `styles.css` 里的 `url()`。
 
+## 本地预览
+
+用 `vite`（或任意静态服务器）打开本目录可以快速看样式：
+
+```bash
+vite
+```
+
+但**这不是扩展环境**，`chrome.*` API 一个都没有。页面因此做了两处兼容：
+
+- 资源加载会回退到相对路径（见下方设计说明），所以短语和名言仍能正常显示；
+- favicon 由浏览器按普通 `<link rel="icon">` 处理，与扩展环境下是否显示是两回事。
+
+**只有 Load Unpacked 后的 `chrome://newtab` 才是真实环境。** 扩展相关的行为（尤其是标签页图标是否显示）必须在那里确认。
+
 ## 已知限制
 
 - **隐身窗口不生效。** 这是 Chrome 的硬性限制——扩展无法在隐身窗口覆盖新标签页，与本扩展的实现无关。
@@ -93,7 +108,7 @@ oh-my-new-tab/
 
 ## 设计说明
 
-- **`data/*.json` 通过 `fetch(chrome.runtime.getURL(...))` 读取，不需要 `web_accessible_resources`。** 官方文档明确：*"Only pages or scripts loaded from an extension's origin can access that extension's resources."* `web_accessible_resources` 只管「让**其他**源访问」，本页与资源同源，不在其管辖范围。
+- **`data/*.json` 在扩展内通过 `chrome.runtime.getURL(...)` 读取，不需要 `web_accessible_resources`。** 官方文档明确：*"Only pages or scripts loaded from an extension's origin can access that extension's resources."* `web_accessible_resources` 只管「让**其他**源访问」，本页与资源同源，不在其管辖范围。页面本身就从扩展根目录提供服务，所以 `data/phrases.json` 这样的相对路径解析出的 URL 与 `getURL()` 完全一致；`resolveResource()` 在 `getURL` 不存在时回退到相对路径，两种环境下都能工作。
 - **不需要 `host_permissions`。** 官方文档：*"Without requesting additional privileges, the extension can call `fetch()` to get resources within its installation."*
 - **不需要任何 `permissions` 字段。** 除 `chrome.runtime.getURL` 外未使用任何扩展 API，而它无需声明权限。
 - **没有内联脚本。** MV3 默认 CSP 为 `script-src 'self'; object-src 'self';`，内联 JS 会被拒绝，因此所有脚本都放在独立 `.js` 文件中。该默认 CSP 未限制 `connect-src`，同源 fetch 不受影响。
