@@ -11,7 +11,7 @@
  */
 
 const PHRASES_PATH = "data/phrases.json";
-const QUOTES_PATH = "data/quotes.json";
+const QUOTES_PATH = "data/anime-quotes.json";
 
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
 
