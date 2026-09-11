@@ -38,7 +38,7 @@ oh-my-new-tab/
 
 ### 修改名言
 
-编辑 `data/quotes.json`。每项只需要 `content` 和 `author` 两个字段，`author` 建议连书名一起写，例如 `"李白《将进酒》"`。渲染时会自动在前面加 `—— `。
+编辑 `data/quotes.json`。每项只需要 `content` 和 `author` 两个字段，`author` 建议连书名一起写，例如 `"李白《将进酒》"`。渲染时 `author` 会被原样输出在 `content` 的下一行，不加任何前缀——想加破折号之类的符号，直接写进 `author` 字段即可。
 
 ### 更换标签页图标
 

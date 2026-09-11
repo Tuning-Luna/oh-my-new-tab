@@ -66,7 +66,7 @@ export async function renderQuote(contentEl, authorEl) {
     const quote = pickRandom(quotes);
     // `??` rather than `||` so an intentionally empty string is preserved.
     contentEl.textContent = quote.content ?? "";
-    authorEl.textContent = quote.author ? `—— ${quote.author}` : "";
+    authorEl.textContent = quote.author ?? "";
   } catch (error) {
     console.error(`[newtab] Could not load ${QUOTES_PATH}:`, error);
   }
