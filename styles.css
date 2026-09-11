@@ -1,23 +1,4 @@
 /* ===========================================================================
- * Fonts
- * ======================================================================== */
-
-/* Bundled rather than referenced by name: Noto Sans SC is not installed on
- * Windows by default, and naming a font that is absent fails silently — the
- * Chinese would simply be drawn by whatever the fallback resolves to, with no
- * error anywhere. Shipping the file makes the quote look the same everywhere.
- *
- * Noto Sans SC is licensed under the SIL Open Font License 1.1; the licence
- * text sits beside the font in assets/fonts/. */
-@font-face {
-  font-family: "Noto Sans SC";
-  src: url("assets/fonts/NotoSansSC-VF.woff2") format("woff2");
-  /* One variable file covers the whole weight range. */
-  font-weight: 100 900;
-  font-display: swap;
-}
-
-/* ===========================================================================
  * Tunables — everything you are likely to want to change lives in this block.
  * ======================================================================== */
 
@@ -58,9 +39,9 @@
   /* Chinese quotes need a face that actually contains CJK glyphs. A Latin
    * serif listed first (Georgia, Constantia, Sitka) does not, and the Chinese
    * is silently substituted from a fallback face instead — which is why this
-   * stack leads with the bundled font and then lists real CJK faces. */
-  --font-quote: "Noto Sans SC", "Microsoft YaHei", "PingFang SC",
-    "Hiragino Sans GB", sans-serif;
+   * stack lists real CJK faces only. */
+  --font-quote: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
+    sans-serif;
 
   /* ---- vertical placement ----
    * Each slot is centred on its own share of the viewport height, so the three

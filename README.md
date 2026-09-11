@@ -26,10 +26,7 @@ oh-my-new-tab/
 │   └── quotes.json      名言，{ content, author } 数组
 └── assets/
     ├── JSA.png          背景图
-    ├── favicon.svg      标签页图标
-    └── fonts/
-        ├── NotoSansSC-VF.woff2    引文字体（7.4MB，可变字重 100–900）
-        └── OFL-NotoSansSC.txt     该字体的 SIL OFL 1.1 授权
+    └── favicon.svg      标签页图标
 ```
 
 > 页面文件名由 `manifest.json` 的 `chrome_url_overrides.newtab` 指定，扩展不做目录索引，因此文件名本身是自由的，`index.html` 只是约定。
@@ -54,7 +51,7 @@ oh-my-new-tab/
 
 ```css
 :root {
-  --bg-blur: 16px;   /* 改为 0px 即完全关闭模糊 */
+  --bg-blur: 10px;   /* 改为 0px 即完全关闭模糊 */
 }
 ```
 
@@ -87,8 +84,8 @@ oh-my-new-tab/
 ```css
 :root {
   --font-clock: "Segoe UI Variable Display", "Segoe UI", system-ui, ...;
-  --font-ui:    system-ui, ...;                  /* 短语 */
-  --font-quote: KaiTi, SimSun, "Songti SC", ...; /* 名言 */
+  --font-ui:    system-ui, ...;                         /* 短语 */
+  --font-quote: "Microsoft YaHei", "PingFang SC", ...;  /* 名言 */
 }
 ```
 
@@ -96,7 +93,7 @@ oh-my-new-tab/
 
 **`--font-quote` 必须选含中文字形的字体。** 把 Georgia、Constantia、Sitka 这类纯西文衬线放在前面，中文不会报错，而是被**静默回退**成另一个字体，观感与预期不符。
 
-引文用的是**随扩展打包**的 Noto Sans SC（`assets/fonts/`），不依赖本机是否安装。不打包而只写字体名的话，Windows 默认没有这个字体，中文会被别的字体静默接管。若要换成系统字体（如 `KaiTi`、`SimSun`、`Microsoft YaHei`），记得同时删掉 `@font-face` 和 `assets/fonts/`，否则那 7.4MB 会一直躺在扩展包里。
+引文目前用**系统字体**，不随扩展打包：Windows 落到微软雅黑，macOS 落到苹方。代价是**跨机器观感可能不一致**——若要求任何机器上都完全一样，需要把字体文件打包进 `assets/` 并用 `@font-face` 引入（此前用过这个方案，见 git 历史 `e864601`）。
 
 ### 短语为什么总是一行
 
@@ -110,9 +107,7 @@ oh-my-new-tab/
 
 ## 体积
 
-扩展包主要由两项构成：引文字体 **7.4MB**（`assets/fonts/`）+ 背景图 **1.2MB**。
-
-字体是从 [google/fonts](https://github.com/google/fonts) 下载的可变字重 TTF（17.0MB）转成 woff2 后的结果，压缩掉 56%。它是本地文件，新标签页加载不产生网络请求。
+扩展包只有背景图 **1.2MB** 一项主要资源。
 
 背景图已做过无损压缩：**1619KB → 1189KB（-26.6%）**。
 
@@ -162,7 +157,7 @@ vite
 - **时钟每秒对齐秒边界重排定时器**，不会累积漂移；从后台标签页切回时会立即重绘（Chrome 会限制后台标签页的定时器频率）。
 - **三个模块是三个独立定位的兄弟节点，不是一条居中列。** 只有这样短语才能钉在屏幕正中、而名言落在它与底部之间；单列布局做不到这一点。
 - **时钟字体选 `Segoe UI Variable Display`**，它是 Windows 11 为大字号提供的显示用光学尺寸。选它之前实测过各候选字体的等宽数字支持与字重轴可用性（见上方「调整字体」）。
-- **引文字体随包分发而不是按名引用。** Noto Sans SC 在 Windows 上默认不存在，而 `font-family` 写了不存在的字体**不会报错**——中文由回退字体画出，问题无声无息。打包这个文件是唯一能保证渲染一致的做法。判断字体是否真的生效，不能看「有没有报错」，要比对渲染出的像素（见下方验证记录）。
+- **`font-family` 写了一个不存在的字体不会报错。** 中文会由回退字体照常画出，问题无声无息；要确认某个字体是否真的生效，不能看「有没有报错」或「字体名写对没有」，得比对渲染出的像素。引文现在依赖系统字体，跨机器观感可能不同。
 - **短语的单行自适应是一次测量而非循环试探。** 文本宽度与字号严格成正比，量一次即可算出恰好放得下的字号。
 - **当前为只读展示，未使用 `chrome.storage`。** 若将来要支持用户自定义数据：小型偏好（如模糊值、开关）用 `chrome.storage.sync`（约 100KB，单键 8KB），较大缓存用 `chrome.storage.local`（约 10MB）。
 
@@ -174,7 +169,6 @@ vite
 - 背景图压缩后经逐像素比对，可见像素完全一致。
 - 页面在 headless Chrome 中实拍渲染通过（背景、模糊、居中、四项内容均正确）。
 - 三个模块的垂直位置经实测为 25% / 50% / 75%：短语中心落在视口 50% 处误差 0.5px。
-- 打包字体经**像素比对**确认真正生效：其渲染哈希同时不同于「不存在的字体族」和「微软雅黑」，排除了静默回退。仅凭 `font-family` 写对或加载无报错都不足以证明字体生效。
 - 短语单行：最长 46 字符与 61 字符压力样本均为 `lines=1.00`、无横向溢出。
 
 未做浏览器内的端到端验证——需在 `chrome://extensions/` 实际加载后才能确认渲染效果。
