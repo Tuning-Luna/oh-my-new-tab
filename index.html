@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>New Tab</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <!--
+      type="module" implies defer, so the DOM is parsed before main.js runs.
+      A module script is required rather than an inline one: the Manifest V3
+      default CSP is "script-src 'self'; object-src 'self'", which forbids
+      inline JavaScript.
+    -->
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <!-- Background photo and scrim. Purely decorative. -->
+    <div class="bg" aria-hidden="true"></div>
+
+    <main class="stage">
+      <div class="clock" id="clock">--:--:--</div>
+      <p class="date" id="date"></p>
+
+      <p class="phrase" id="phrase"></p>
+
+      <figure class="quote">
+        <blockquote class="quote__content" id="quote-content"></blockquote>
+        <figcaption class="quote__author" id="quote-author"></figcaption>
+      </figure>
+    </main>
+  </body>
+</html>
