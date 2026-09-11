@@ -1,4 +1,23 @@
 /* ===========================================================================
+ * Fonts
+ * ======================================================================== */
+
+/* Bundled rather than referenced by name: Noto Sans SC is not installed on
+ * Windows by default, and naming a font that is absent fails silently — the
+ * Chinese would simply be drawn by whatever the fallback resolves to, with no
+ * error anywhere. Shipping the file makes the quote look the same everywhere.
+ *
+ * Noto Sans SC is licensed under the SIL Open Font License 1.1; the licence
+ * text sits beside the font in assets/fonts/. */
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("assets/fonts/NotoSansSC-VF.woff2") format("woff2");
+  /* One variable file covers the whole weight range. */
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* ===========================================================================
  * Tunables — everything you are likely to want to change lives in this block.
  * ======================================================================== */
 
@@ -39,9 +58,9 @@
   /* Chinese quotes need a face that actually contains CJK glyphs. A Latin
    * serif listed first (Georgia, Constantia, Sitka) does not, and the Chinese
    * is silently substituted from a fallback face instead — which is why this
-   * stack leads with real CJK fonts and ends in the generic serif. */
-  --font-quote: KaiTi, SimSun, "Songti SC", "Source Han Serif SC",
-    "Noto Serif SC", STSong, serif;
+   * stack leads with the bundled font and then lists real CJK faces. */
+  --font-quote: "Noto Sans SC", "Microsoft YaHei", "PingFang SC",
+    "Hiragino Sans GB", sans-serif;
 
   /* ---- vertical placement ----
    * Each slot is centred on its own share of the viewport height, so the three
@@ -157,12 +176,15 @@ body {
  * this element is its own slot, so the two rules target one element. */
 .slot--phrase {
   margin: 0;
+  /* Upper bound only — js/fit.js shrinks any phrase that would not fit on one
+   * line, so the rendered size is this value or smaller. */
   font-size: clamp(1.75rem, 4.6vw, 5rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--fg-muted);
-  /* Even out the line lengths when the phrase wraps. */
-  text-wrap: balance;
+  /* Required by the fitter: without it the text wraps and scrollWidth reports
+   * the wrapped width, hiding how wide the line really wants to be. */
+  white-space: nowrap;
   text-shadow: var(--text-shadow);
 }
 

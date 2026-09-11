@@ -1,5 +1,6 @@
 import { startClock } from "./time.js";
 import { renderPhrase, renderQuote } from "./content.js";
+import { fitToOneLine } from "./fit.js";
 
 /** Looks up a required element, failing loudly if index.html drifts. */
 function byId(id) {
@@ -16,10 +17,26 @@ function init() {
     dateEl: byId("date"),
   });
 
-  // Deliberately not awaited: the clock must keep running even if one of the
-  // JSON files is missing or malformed. Each call reports its own failure.
-  renderPhrase(byId("phrase"));
+  const phraseEl = byId("phrase");
+  // Fitting needs the text in place, so it runs once the phrase has landed.
+  // renderPhrase reports its own failures and never rejects, so this always
+  // runs — on an empty element it is simply a no-op.
+  renderPhrase(phraseEl).then(() => fitToOneLine(phraseEl));
+
   renderQuote(byId("quote-content"), byId("quote-author"));
+
+  // Both the slot width and the clamp() font size depend on the viewport, so
+  // the phrase has to be re-fitted whenever the window changes size. Coalesce
+  // the burst of resize events into one fit per frame.
+  let queued = false;
+  addEventListener("resize", () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      fitToOneLine(phraseEl);
+    });
+  });
 }
 
 // A type="module" script is deferred, so the DOM is already parsed by the time
