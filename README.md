@@ -1,6 +1,6 @@
 # oh-my-new-tab
 
-一个 Chrome 新标签页替换扩展（Manifest V3）。垂直居中展示当前时间、日期、一句随机短语和一条随机名言，背景为模糊处理后的本地图片。
+一个 Chrome 新标签页替换扩展（Manifest V3）。按视口高度分三层展示：时间与日期在上、一句随机短语居于屏幕正中、一条随机名言落在短语与屏幕底部之间，背景为模糊处理后的本地图片。
 
 ## 安装
 
@@ -64,6 +64,34 @@ oh-my-new-tab/
 }
 ```
 
+### 调整位置
+
+三个模块各自独立定位，`top` 描述的是**该模块中心**的位置（因为配了 `translate(-50%, -50%)`），取值是视口高度的百分比：
+
+```css
+:root {
+  --head-y: 25%;     /* 时间 + 日期 */
+  --phrase-y: 50%;   /* 短语 —— 屏幕正中 */
+  --quote-y: 75%;    /* 名言 —— 短语与屏幕底部的中间 */
+}
+```
+
+`.stage` 有一个 `min-height: max(100vh, 40rem)` 的下限：窗口过矮时页面改为滚动，避免三个模块叠在一起。副作用是这种情况下短语会低于屏幕正中。
+
+### 调整字体
+
+```css
+:root {
+  --font-clock: "Segoe UI Variable Display", "Segoe UI", system-ui, ...;
+  --font-ui:    system-ui, ...;                  /* 短语 */
+  --font-quote: KaiTi, SimSun, "Songti SC", ...; /* 名言 */
+}
+```
+
+**换 `--font-clock` 前请先验证该字体支持 `tnum` 特性。** 时钟用了 `font-variant-numeric: tabular-nums` 来保证数字等宽，缺这个特性的字体会让 `tabular-nums` **静默失效**，时钟宽度随时间每秒变化。实测本机 Corbel / Candara / Georgia / Franklin Gothic 都不支持，Segoe UI 支持。
+
+**`--font-quote` 必须选含中文字形的字体。** 把 Georgia、Constantia、Sitka 这类纯西文衬线放在前面，中文不会报错，而是被**静默回退**成另一个字体，观感与预期不符。
+
 ### 更换背景图
 
 替换 `assets/JSA.png`，或改 `styles.css` 中 `.bg` 的 `url()`。图片是照片级内容，若在意体积可考虑换成 WebP——见下方「体积」一节。
@@ -116,6 +144,8 @@ vite
 - **日期固定 `en-US`。** `Intl.DateTimeFormat` 显式指定 locale，输出恒为英文，不受浏览器界面语言影响。
 - **所有文本用 `textContent` 写入，不用 `innerHTML`。** JSON 里的内容即使含标签也只会当纯文本显示。
 - **时钟每秒对齐秒边界重排定时器**，不会累积漂移；从后台标签页切回时会立即重绘（Chrome 会限制后台标签页的定时器频率）。
+- **三个模块是三个独立定位的兄弟节点，不是一条居中列。** 只有这样短语才能钉在屏幕正中、而名言落在它与底部之间；单列布局做不到这一点。
+- **时钟字体选 `Segoe UI Variable Display`**，它是 Windows 11 为大字号提供的显示用光学尺寸。选它之前实测过各候选字体的等宽数字支持与字重轴可用性（见上方「调整字体」）。
 - **当前为只读展示，未使用 `chrome.storage`。** 若将来要支持用户自定义数据：小型偏好（如模糊值、开关）用 `chrome.storage.sync`（约 100KB，单键 8KB），较大缓存用 `chrome.storage.local`（约 10MB）。
 
 ## 验证情况
