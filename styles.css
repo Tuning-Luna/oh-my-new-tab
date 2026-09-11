@@ -16,6 +16,11 @@
    * never flashes white on open. */
   --bg-base: #101014;
 
+  /* How far to lift the whole stack above the geometric centre of the
+   * viewport. Purely optical: the content stays centred by `margin: auto`,
+   * this only nudges where that centre sits. Set to 0vh to remove it. */
+  --stage-lift: 8vh;
+
   --fg: #ffffff;
   --fg-muted: rgba(255, 255, 255, 0.78);
   --text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
@@ -70,6 +75,7 @@ body {
    * the top of the page. */
   margin: auto;
   position: relative; /* required for z-index to lift it above .bg */
+  top: calc(-1 * var(--stage-lift)); /* relative offset: layout is untouched */
   z-index: 1;
 
   max-width: 52rem;
@@ -102,7 +108,7 @@ body {
 
 .phrase {
   margin: 2.75rem 0 0;
-  font-size: clamp(1rem, 1.9vw, 1.4rem);
+  font-size: clamp(1.2rem, 2.3vw, 1.75rem);
   color: var(--fg-muted);
   text-shadow: var(--text-shadow);
 }
@@ -113,14 +119,14 @@ body {
 
 .quote__content {
   margin: 0;
-  font-size: clamp(1.05rem, 2.1vw, 1.5rem);
+  font-size: clamp(1.3rem, 2.7vw, 2rem);
   line-height: 1.7;
   text-shadow: var(--text-shadow);
 }
 
 .quote__author {
   margin-top: 0.6rem;
-  font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
   letter-spacing: 0.04em;
   color: var(--fg-muted);
   text-shadow: var(--text-shadow);
