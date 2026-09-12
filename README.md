@@ -22,8 +22,9 @@ oh-my-new-tab/
 │   ├── content.js       随机短语与随机名言
 │   └── fit.js           短语单行自适应
 ├── data/
-│   ├── phrases.json     短语，字符串数组
-│   └── quotes.json      名言，{ content, author } 数组
+│   ├── phrases.json      短语，字符串数组
+│   ├── anime-quotes.json 名言数组，每项只读取 content 与 author
+│   └── quotes.json       早期的一小份名言，当前未被加载
 └── assets/
     ├── JSA.png          背景图
     └── favicon.svg      标签页图标
@@ -39,7 +40,11 @@ oh-my-new-tab/
 
 ### 修改名言
 
-编辑 `data/quotes.json`。每项只需要 `content` 和 `author` 两个字段。
+编辑 `data/anime-quotes.json`，它是一个数组，每项只读取 `content` 和 `author` 两个字段。
+
+该文件由 anime-quote 数据集导出，每条约有十个额外字段（`id`、`uuid`、`created_at`、`creator` 等）不被使用，删掉它们不影响显示。当前 1465 条共约 575 KB，如果要缩小体积，从这里入手。
+
+`data/quotes.json` 是早期的一小份名言，`js/content.js` 现在不加载它。
  
 ### 更换标签页图标
 
