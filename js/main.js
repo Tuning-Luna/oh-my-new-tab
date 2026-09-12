@@ -12,10 +12,15 @@ function byId(id) {
 }
 
 function init() {
+  const clockEl = byId("clock");
   startClock({
-    clockEl: byId("clock"),
+    clockEl,
     dateEl: byId("date"),
   });
+
+  // startClock renders synchronously, so the real time is already in the DOM
+  // and the fitter measures it rather than the placeholder.
+  fitToOneLine(clockEl);
 
   const phraseEl = byId("phrase");
   // Fitting needs the text in place, so it runs once the phrase has landed.
@@ -26,14 +31,15 @@ function init() {
   renderQuote(byId("quote-content"), byId("quote-author"));
 
   // Both the slot width and the clamp() font size depend on the viewport, so
-  // the phrase has to be re-fitted whenever the window changes size. Coalesce
-  // the burst of resize events into one fit per frame.
+  // the clock and the phrase have to be re-fitted whenever the window changes
+  // size. Coalesce the burst of resize events into one fit per frame.
   let queued = false;
   addEventListener("resize", () => {
     if (queued) return;
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
+      fitToOneLine(clockEl);
       fitToOneLine(phraseEl);
     });
   });
