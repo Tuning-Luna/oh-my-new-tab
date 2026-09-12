@@ -133,6 +133,8 @@ body {
 
 .clock {
   font-family: var(--font-clock);
+  /* Upper bound only — js/fit.js shrinks the clock if it would not fit on one
+   * line, so the rendered size is this value or smaller. */
   font-size: clamp(4.5rem, 13vw, 9.5rem);
   font-weight: 400;
   line-height: 1;
@@ -141,6 +143,10 @@ body {
    * jitter sideways as the seconds change. Only honoured by fonts that carry
    * the `tnum` feature — see --font-clock. */
   font-variant-numeric: tabular-nums;
+  /* Required by the fitter: without it a clock too wide for the slot wraps
+   * first, and scrollWidth reports the wrapped width instead of the width the
+   * line really wants. */
+  white-space: nowrap;
   text-shadow: var(--text-shadow);
 }
 
