@@ -36,6 +36,12 @@ const QUOTE_SOURCES = [
   "data/video-quotes.json",
 ];
 
+/**
+ * Joins the author and the work in the attribution line. `from_who` names the
+ * author, `from` the work they are quoted from; both are shown when both exist.
+ */
+const ATTRIBUTION_SEPARATOR = " · ";
+
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
 
 /**
@@ -80,7 +86,30 @@ export async function renderPhrase(el) {
   }
 }
 
-/** Picks one quote and writes its hitokoto and author into the given elements. */
+/**
+ * Builds the attribution line for a quote.
+ *
+ * `from_who` is the author and `from` is the work; both are shown when both are
+ * present, either one alone is shown on its own. An absent field is null — the
+ * bundled files carry no empty strings.
+ *
+ * The values are trimmed first: one bundled entry carries a lone ideographic
+ * space (U+3000) in `from` where it has no work name, and trim() drops it
+ * because U+3000 is a Unicode space separator. Trimming also makes the equality
+ * test meaningful, so the 45 entries credited to their own title — `伴我同行`
+ * attributed to `伴我同行` — collapse to one instead of printing twice. Entries
+ * where one value merely contains the other, such as `夏目` in `夏目友人帐`,
+ * are a person and their work, not a duplicate, and are left alone.
+ */
+function formatAttribution(quote) {
+  const author = quote.from_who?.trim() ?? "";
+  const work = quote.from?.trim() ?? "";
+  if (!author) return work;
+  if (!work || author === work) return author;
+  return `${author}${ATTRIBUTION_SEPARATOR}${work}`;
+}
+
+/** Picks one quote and writes its hitokoto and attribution into the given elements. */
 export async function renderQuote(contentEl, authorEl) {
   const path = pickRandom(QUOTE_SOURCES);
   try {
@@ -93,9 +122,7 @@ export async function renderQuote(contentEl, authorEl) {
     const quote = pickRandom(quotes);
     // `??` rather than `||` so an intentionally empty string is preserved.
     contentEl.textContent = quote.hitokoto ?? "";
-    // `from_who` is null on an unattributed line, which leaves the work it
-    // comes from as the best label available.
-    authorEl.textContent = quote.from_who ?? quote.from ?? "";
+    authorEl.textContent = formatAttribution(quote);
   } catch (error) {
     console.error(`[newtab] Could not load ${path}:`, error);
   }
