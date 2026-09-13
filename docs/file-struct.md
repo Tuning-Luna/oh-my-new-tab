@@ -1,0 +1,26 @@
+## 文件结构
+
+```
+oh-my-new-tab/
+├── manifest.json              MV3 清单，通过 chrome_url_overrides.newtab 注册新标签页
+├── index.html                 页面结构
+├── styles.css                 样式与全部可调参数（见文件顶部 :root 块）
+├── js/
+│   ├── main.js                启动入口，装配 DOM
+│   ├── time.js                时钟与日期
+│   ├── content.js             随机短语与随机名言
+│   └── fit.js                 短语单行自适应
+├── data/
+│   ├── phrases.json           短语，字符串数组
+│   ├── anime-quotes.json      动画语料，1465 条，约 560 KB
+│   ├── literature-quotes.json 文学语料，1944 条，约 770 KB
+│   ├── poem-quotes.json       诗词语料，753 条，约 275 KB
+│   └── video-quotes.json      影视语料，196 条，约 77 KB
+└── assets/
+    ├── JSA.png                            背景图
+    ├── favicon.svg                        标签页图标
+    ├── NotoSerifCJKsc-VF-subset.woff2     名言字体，Noto Serif CJK SC 的可变字体子集，约 4.3 MB
+    └── NotoSerifCJKsc-OFL.txt             该字体的 SIL OFL 1.1 许可证与版权声明
+```
+
+> 页面文件名由 `manifest.json` 的 `chrome_url_overrides.newtab` 指定，扩展不做目录索引，因此文件名本身是自由的，`index.html` 只是约定。
