@@ -13,6 +13,13 @@
 const PHRASES_PATH = "data/phrases.json";
 
 /**
+ * Appended to every phrase as it is rendered, so the phrase list holds the
+ * phrases alone and the name lives in one place. Set it to "" for no
+ * addressee, which drops the comma with it.
+ */
+const PHRASE_ADDRESSEE = "TuningLuna";
+
+/**
  * The sentence files a new tab may draw from, in the hitokoto schema. This
  * array is the only thing that decides the range: add a file to widen it,
  * remove one to narrow it, reorder freely - the order carries no meaning.
@@ -64,7 +71,10 @@ export async function renderPhrase(el) {
       console.warn(`[newtab] ${PHRASES_PATH} is empty, so no phrase is shown.`);
       return;
     }
-    el.textContent = pickRandom(phrases);
+    const phrase = pickRandom(phrases);
+    el.textContent = PHRASE_ADDRESSEE
+      ? `${phrase}, ${PHRASE_ADDRESSEE}`
+      : phrase;
   } catch (error) {
     console.error(`[newtab] Could not load ${PHRASES_PATH}:`, error);
   }
