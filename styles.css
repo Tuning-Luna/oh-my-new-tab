@@ -43,6 +43,26 @@
   --font-quote: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB",
     sans-serif;
 
+  /* ---- motion ----
+   * One curve for everything here that settles into place: the clock and date
+   * rising as the page opens, and a changed digit landing. Sharing it is what
+   * keeps the two from reading as separate effects. */
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Entrance. How long the clock takes to rise into place, how far it travels,
+   * and how long the date waits so the block resolves top-down instead of
+   * arriving as one slab. */
+  --rise-duration: 620ms;
+  --rise-shift: 0.6rem;
+  --rise-stagger: 120ms;
+
+  /* A digit that changes fades back up from --blip-fade while dropping into
+   * place from --blip-shift. `em` so the travel scales with the clock, which
+   * js/fit.js may have shrunk. Set --blip-duration to 0s to turn this off. */
+  --blip-duration: 140ms;
+  --blip-fade: 0.45;
+  --blip-shift: -0.06em;
+
   /* ---- vertical placement ----
    * Each slot is centred on its own share of the viewport height, so the three
    * blocks are positioned independently rather than stacked. */
@@ -131,6 +151,35 @@ body {
  * Content
  * ======================================================================== */
 
+/* The clock and the date rise into place as the page opens.
+ *
+ * Both sit on the two elements rather than on .slot--head, because .slot
+ * already uses `transform` to centre itself and a keyframe that sets
+ * `transform` would replace that centring instead of composing with it.
+ *
+ * A @keyframes animation rather than a transition driven by @starting-style:
+ * that at-rule is for elements appearing out of `display: none`, and for an
+ * ordinary first render an animation is both simpler and reliably triggered.
+ * js/time.js has swapped the placeholder for a real time by the time this
+ * plays, so the fade covers that swap as well. */
+.clock,
+.date {
+  animation: rise var(--rise-duration) var(--ease-settle) both;
+}
+
+/* Declared after the rule above, whose `animation` shorthand resets
+ * animation-delay to 0 — so this has to come second to win. */
+.date {
+  animation-delay: var(--rise-stagger);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise-shift));
+  }
+}
+
 .clock {
   font-family: var(--font-clock);
   /* Upper bound only — js/fit.js shrinks the clock if it would not fit on one
@@ -148,6 +197,42 @@ body {
    * line really wants. */
   white-space: nowrap;
   text-shadow: var(--text-shadow);
+}
+
+/* One span per digit, built by js/time.js. `inline-block` is what makes the
+ * transform in `blip` below apply at all — a transform has no effect on a
+ * non-replaced inline box. The spans carry no whitespace between them, so the
+ * line they produce is the one plain text would have produced, and the
+ * measurement js/fit.js takes off .clock is unchanged. */
+.clock__digit {
+  display: inline-block;
+}
+
+/* The tenths digit is the one field that cannot carry an animation: it
+ * advances every 100ms, which is both too fast for a transition to settle in
+ * and fast enough that a flash would be seen as one (see the `flash` note in
+ * js/time.js for the full reasoning). Rather than leave it looking like the
+ * digit that was forgotten, it is pushed back — dimmer, so it reads as the
+ * clock's fast lane instead of competing with the digits that do land.
+ *
+ * --fg-muted is the same secondary colour .date and .slot--phrase use. Change
+ * it there if you want the tenths adjusted without touching those two. */
+.clock__digit--tenths {
+  color: var(--fg-muted);
+}
+
+/* Added and removed by js/time.js every time a digit changes. The shift is in
+ * em, so it stays proportional to whatever size the fitter settled on. Tenths
+ * never gets this class — see `FIELDS` in js/time.js for why. */
+.clock__digit.is-flash {
+  animation: blip var(--blip-duration) var(--ease-settle);
+}
+
+@keyframes blip {
+  from {
+    opacity: var(--blip-fade);
+    transform: translateY(var(--blip-shift));
+  }
 }
 
 .date {
@@ -196,4 +281,43 @@ body {
    * than leaving a short orphan, the same reason .quote__content uses it. */
   text-wrap: balance;
   text-shadow: var(--text-shadow);
+}
+
+/* ===========================================================================
+ * Reduced motion
+ * ======================================================================== */
+
+/*
+ * The OS setting asks for less movement, not for no visual change at all:
+ * MDN's accessibility guidance and WCAG's "Animation from Interactions" both
+ * keep fades while dropping the travel that vestibular sensitivity reacts to.
+ * So the entrance keeps its fade and loses its rise, and the digit flash —
+ * pure movement, and the only animation here that fires again and again for as
+ * long as the page is open — is dropped entirely.
+ *
+ * The clock's fade is also the one piece of motion here doing real work:
+ * index.html ships a "--:--:--.-" placeholder that the first frame replaces,
+ * and the fade is what covers that swap.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .clock,
+  .date {
+    animation: fade var(--rise-duration) ease-out both;
+  }
+
+  /* The shorthand above resets animation-delay, so the stagger has to be
+   * restored here rather than inherited from the rule further up. */
+  .date {
+    animation-delay: var(--rise-stagger);
+  }
+
+  .clock__digit.is-flash {
+    animation: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
 }
