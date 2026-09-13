@@ -28,8 +28,10 @@ oh-my-new-tab/
 │   ├── poem-quotes.json       诗词语料，753 条，约 275 KB
 │   └── video-quotes.json      影视语料，196 条，约 77 KB
 └── assets/
-    ├── JSA.png                背景图
-    └── favicon.svg            标签页图标
+    ├── JSA.png                            背景图
+    ├── favicon.svg                        标签页图标
+    ├── NotoSerifCJKsc-VF-subset.woff2     名言字体，Noto Serif CJK SC 的可变字体子集，约 4.3 MB
+    └── NotoSerifCJKsc-OFL.txt             该字体的 SIL OFL 1.1 许可证与版权声明
 ```
 
 > 页面文件名由 `manifest.json` 的 `chrome_url_overrides.newtab` 指定，扩展不做目录索引，因此文件名本身是自由的，`index.html` 只是约定。
@@ -52,6 +54,38 @@ oh-my-new-tab/
 
 每份语料除这三个字段外还有约九个字段（`id`、`uuid`、`creator`、`created_at` 等）不被使用，删掉不影响显示，这也是缩小体积的入手点。
 
+### 名言字体
+
+名言用 `assets/NotoSerifCJKsc-VF-subset.woff2` 渲染，页面其余部分不受影响：字体族名只出现在 `styles.css` 顶部的 `@font-face` 与 `--font-quote` 里，而 `--font-quote` 只被 `.quote__content` 和 `.quote__author` 引用。想换回系统字体，把 `--font-quote` 首选的那个名字删掉即可。
+
+这个文件是**子集，不是上游原文件**。上游 `NotoSerifCJKsc-VF.otf` 有 52.8 MB，而四份语料加起来只用到 3770 个不同字符。裁到「语料用字 ∪ GB2312 全表」后是 4.3 MB，字体可用时间从约 830 ms 降到约 200 ms。`font-display` 取 `block` 而非 `swap`，为的是**完全不绘制备用字体**（`swap` 下备用字体是实打实画出来的，实测可截图证实）；代价是字体就绪前名言不可见，所以体积必须先降下来，否则那段时间会很长。
+
+要重新生成，先造保留字符表，再跑 `pyftsubset`（需要 `fonttools` 与 `brotli`）：
+
+```sh
+python - <<'PY' > /tmp/keep.txt
+import json, glob
+keep = set()
+for f in glob.glob("data/*.json"):
+    for row in json.load(open(f, encoding="utf-8")):
+        vals = [row] if isinstance(row, str) else [row.get(k) for k in ("hitokoto", "from_who", "from")]
+        keep |= {c for v in vals if isinstance(v, str) for c in v}
+for hi in range(0xA1, 0xF8):                    # 全部 GB2312
+    for lo in range(0xA1, 0xFF):
+        try: keep.add(bytes([hi, lo]).decode("gb2312"))
+        except UnicodeDecodeError: pass
+print("".join(sorted(c for c in keep if ord(c) > 0x20)), end="")
+PY
+
+python -m fontTools.subset assets/NotoSerifCJKsc-VF.otf --text-file=/tmp/keep.txt \
+  --output-file=assets/NotoSerifCJKsc-VF-subset.woff2 --flavor=woff2 \
+  --layout-features='*' --name-IDs='*' --no-hinting --desubroutinize
+```
+
+保留集刻意取「语料用字 ∪ GB2312 全表」而不是仅当前语料：语料里有 1073 个字符不在 GB2312 一级字表内，说明这些语料用字本来就偏冷僻，只按当前语料裁的话，以后新增名言一旦用到表外字符，那一个字会单独退回系统字体，在一行衬线字里很显眼。
+
+字重轴 200–900 完整保留，改 `.quote__content` 的 `font-weight` 即可取用。`@font-face` 里的 `font-weight: 200 900` 不能省略——这个文件是可变字体且默认实例是 200（ExtraLight），而描述符缺省为 `normal`，会把轴钉死。
+
 ### 更换标签页图标
 
 替换 `assets/favicon.svg`，或在 `index.html` 中修改 `<link rel="icon">` 的 `href`。当前图标是 1024×1024 的方形图标，PNG 与 SVG 都可用；写 `type="image/svg+xml"` 时需确保文件确为 SVG。
@@ -72,3 +106,7 @@ oh-my-new-tab/
 该仓库 README 明确声明：只有它提供的**超链接调用方式**不受 AGPL 的传染，**其余使用方式**都需遵循 AGPL。像本项目这样把 JSON 直接打包进扩展属于后者，因此整个扩展按 AGPL-3.0 发布——AGPL 是强 copyleft，仅标注出处并不足以合规。
 
 语料的著作权并非完全由一言网持有，原作者可以要求下架；上游给出的渠道是 `i@loli.online`。如果你是其中某条的作者并希望移除，走该渠道，并可在本仓库同步删除对应条目。
+
+字体是另一条独立的授权线，与上面的 AGPL 无关。`assets/NotoSerifCJKsc-VF-subset.woff2` 是 **Noto Serif CJK SC** 的子集，上游以 **SIL OFL 1.1** 授权，版权 © 2017-2024 Adobe，Noto 是 Google Inc. 的商标。OFL 允许把字体与任何许可证下的软件打包分发，本项目的 AGPL-3.0 也不例外；反过来 AGPL 也不会传染到字体上。许可证全文与版权声明随字体一起放在 `assets/NotoSerifCJKsc-OFL.txt`。
+
+上游版权声明中**没有声明 Reserved Font Name**，所以子集化——在 OFL 的定义下属于修改——之后仍可沿用原名。若日后换成别的字体，这层义务同样成立：字体文件必须与它的许可证和版权声明一起分发。
