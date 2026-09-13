@@ -54,7 +54,7 @@ export async function renderPhrase(el) {
   }
 }
 
-/** Picks one quote and writes its content and author into the given elements. */
+/** Picks one quote and writes its hitokoto and author into the given elements. */
 export async function renderQuote(contentEl, authorEl) {
   try {
     const quotes = await loadJsonArray(QUOTES_PATH);
@@ -65,8 +65,8 @@ export async function renderQuote(contentEl, authorEl) {
 
     const quote = pickRandom(quotes);
     // `??` rather than `||` so an intentionally empty string is preserved.
-    contentEl.textContent = quote.content ?? "";
-    authorEl.textContent = quote.author ?? "";
+    contentEl.textContent = quote.hitokoto ?? "";
+    authorEl.textContent = quote.from_who ?? quote.from ?? "";
   } catch (error) {
     console.error(`[newtab] Could not load ${QUOTES_PATH}:`, error);
   }
