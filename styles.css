@@ -191,5 +191,9 @@ body {
   font-size: clamp(1rem, 1.8vw, 1.35rem);
   letter-spacing: 0.04em;
   color: var(--fg-muted);
+  /* Both the author and the work are shown now, so this line can run to about
+   * 64 characters and wrap on a narrow window. Balance the two lines rather
+   * than leaving a short orphan, the same reason .quote__content uses it. */
+  text-wrap: balance;
   text-shadow: var(--text-shadow);
 }
