@@ -2,7 +2,7 @@
 /**
  * Random phrase and random quote, read from the JSON files in data/.
  *
- * Both files are fetched from the extension's own origin, so these are
+ * Every file is fetched from the extension's own origin, so these are
  * same-origin reads: they need neither `web_accessible_resources` (which only
  * governs access from *other* origins) nor `host_permissions`.
  *
@@ -11,7 +11,23 @@
  */
 
 const PHRASES_PATH = "data/phrases.json";
-const QUOTES_PATH = "data/anime-quotes.json";
+
+/**
+ * The sentence files a new tab may draw from, in the hitokoto schema. This
+ * array is the only thing that decides the range: add a file to widen it,
+ * remove one to narrow it, reorder freely - the order carries no meaning.
+ *
+ * A load picks one file at random and then one entry from that file, so every
+ * file carries the same weight however many entries it holds: the 196 video
+ * lines come up as often as the 1944 literature ones. To weight by entry count
+ * instead, concatenate the files and pick once.
+ */
+const QUOTE_SOURCES = [
+  "data/anime-quotes.json",
+  "data/literature-quotes.json",
+  "data/poem-quotes.json",
+  "data/video-quotes.json",
+];
 
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
 
@@ -56,18 +72,21 @@ export async function renderPhrase(el) {
 
 /** Picks one quote and writes its hitokoto and author into the given elements. */
 export async function renderQuote(contentEl, authorEl) {
+  const path = pickRandom(QUOTE_SOURCES);
   try {
-    const quotes = await loadJsonArray(QUOTES_PATH);
+    const quotes = await loadJsonArray(path);
     if (quotes.length === 0) {
-      console.warn(`[newtab] ${QUOTES_PATH} is empty, so no quote is shown.`);
+      console.warn(`[newtab] ${path} is empty, so no quote is shown.`);
       return;
     }
 
     const quote = pickRandom(quotes);
     // `??` rather than `||` so an intentionally empty string is preserved.
     contentEl.textContent = quote.hitokoto ?? "";
+    // `from_who` is null on an unattributed line, which leaves the work it
+    // comes from as the best label available.
     authorEl.textContent = quote.from_who ?? quote.from ?? "";
   } catch (error) {
-    console.error(`[newtab] Could not load ${QUOTES_PATH}:`, error);
+    console.error(`[newtab] Could not load ${path}:`, error);
   }
 }
