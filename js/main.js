@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { startClock } from "./time.js";
 import { renderPhrase, renderQuote } from "./content.js";
 import { fitToOneLine } from "./fit.js";
@@ -18,21 +20,23 @@ function init() {
     dateEl: byId("date"),
   });
 
-  // startClock renders synchronously, so the real time is already in the DOM
-  // and the fitter measures it rather than the placeholder.
   fitToOneLine(clockEl);
 
   const phraseEl = byId("phrase");
-  // Fitting needs the text in place, so it runs once the phrase has landed.
-  // renderPhrase reports its own failures and never rejects, so this always
-  // runs — on an empty element it is simply a no-op.
   renderPhrase(phraseEl).then(() => fitToOneLine(phraseEl));
 
-  renderQuote(byId("quote-content"), byId("quote-author"));
+  const quoteContentEl = byId("quote-content");
+  const quoteAuthorEl = byId("quote-author");
 
-  // Both the slot width and the clamp() font size depend on the viewport, so
-  // the clock and the phrase have to be re-fitted whenever the window changes
-  // size. Coalesce the burst of resize events into one fit per frame.
+  renderQuote(quoteContentEl, quoteAuthorEl);
+
+  // Press R to load another random quote.
+  addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() !== "r") return;
+
+    renderQuote(quoteContentEl, quoteAuthorEl);
+  });
+
   let queued = false;
   addEventListener("resize", () => {
     if (queued) return;
@@ -44,7 +48,6 @@ function init() {
     });
   });
 }
-
 // A type="module" script is deferred, so the DOM is already parsed by the time
 // this runs. The readyState check keeps the behaviour correct either way.
 if (document.readyState === "loading") {

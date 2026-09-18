@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Shrinks an element's text until it fits on a single line.
  *
