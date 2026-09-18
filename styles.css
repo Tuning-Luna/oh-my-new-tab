@@ -333,6 +333,15 @@ body {
   text-shadow: var(--text-shadow);
 }
 
+/* Added and removed by js/content.js every time a new quote is drawn.
+ * Reuses the digit-settle keyframe, so a swap reads as the same motion the
+ * clock uses — see --blip-* above. `em` keeps the shift proportional to the
+ * font size each line settled on. */
+.quote__content.is-swap,
+.quote__author.is-swap {
+  animation: blip var(--blip-duration) var(--ease-settle);
+}
+
 /* ===========================================================================
  * Reduced motion
  * ======================================================================== */
@@ -362,6 +371,13 @@ body {
   }
 
   .clock__digit.is-flash {
+    animation: none;
+  }
+
+  /* The quote swap is the same pure-movement keyframe as the digit flash, so
+   * it goes the same way under reduced motion: dropped rather than faded. */
+  .quote__content.is-swap,
+  .quote__author.is-swap {
     animation: none;
   }
 }

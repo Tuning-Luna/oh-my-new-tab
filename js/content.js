@@ -109,6 +109,28 @@ function formatAttribution(quote) {
   return `${author}${ATTRIBUTION_SEPARATOR}${work}`;
 }
 
+/** Restarts the swap animation in `.is-swap`; see styles.css. */
+const SWAP_CLASS = "is-swap";
+
+/**
+ * Restarts the swap animation, with the same mechanism flash() in time.js
+ * uses: a class that is already on the element has nothing to change, and
+ * removing and re-adding it inside one task leaves the browser a single style
+ * update to apply, so the animation carries on rather than restarting. Reading
+ * a layout property in between forces the removal to be committed first, which
+ * is what makes the re-add a new animation.
+ *
+ * That read is a forced synchronous layout, which would be indefensible in a
+ * per-frame loop — but an element only reaches this branch when the caller
+ * just wrote a new quote into it, so it fires once per quote swap, never per
+ * frame.
+ */
+function animateSwap(el) {
+  el.classList.remove(SWAP_CLASS);
+  void el.offsetWidth;
+  el.classList.add(SWAP_CLASS);
+}
+
 /** Picks one quote and writes its hitokoto and attribution into the given elements. */
 export async function renderQuote(contentEl, authorEl) {
   const path = pickRandom(QUOTE_SOURCES);
@@ -123,6 +145,12 @@ export async function renderQuote(contentEl, authorEl) {
     // `??` rather than `||` so an intentionally empty string is preserved.
     contentEl.textContent = quote.hitokoto ?? "";
     authorEl.textContent = formatAttribution(quote);
+
+    // Animate the swap. Text is written first so the new quote is on screen
+    // before the settle animation plays over it; the class removal has to come
+    // after the write so the reflow in animateSwap() commits it cleanly.
+    animateSwap(contentEl);
+    animateSwap(authorEl);
   } catch (error) {
     console.error(`[newtab] Could not load ${path}:`, error);
   }
