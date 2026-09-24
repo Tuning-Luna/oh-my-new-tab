@@ -26,7 +26,7 @@ oh-my-new-tab/
 │   ├── poem-quotes.json       诗词语料，753 条，约 275 KB
 │   └── video-quotes.json      影视语料，196 条，约 77 KB
 └── assets/
-    ├── JSA.png                            背景图
+    ├── JSA.webp                           背景图
     ├── favicon.svg                        标签页图标
     ├── fullscreen-expand.svg              全屏按钮图标，未全屏时显示
     ├── fullscreen-shrink.svg              全屏按钮图标，全屏时显示

@@ -34,7 +34,7 @@ body {
   /* First layer on top: the scrim. Second layer: the photo. The scrim is a
    * flat colour, so blurring it changes nothing — it only softens the photo. */
   background-image: linear-gradient(var(--bg-scrim), var(--bg-scrim)),
-    url("../assets/JSA.png");
+    url("../assets/JSA.webp");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

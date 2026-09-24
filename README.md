@@ -2,7 +2,7 @@
 
 
 
-<img src="./assets/screen-shot-1789289993832-1.png" style="zoom:50%;" />
+<img src="./assets/screen-shot.webp" style="zoom:50%;" />
 
 
 
