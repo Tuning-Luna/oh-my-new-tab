@@ -4,7 +4,24 @@
     <meta charset="utf-8" />
     <title>New Tab</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-    <link rel="stylesheet" href="styles.css" />
+    <!--
+      The stylesheet, split by concern: tokens.css holds the tunables, base.css
+      the page shell, motion.css the keyframes, and the rest each own one block
+      of the page. Linked rather than bundled because the project has no build
+      step, and linked individually rather than through @import because that
+      would serialise the loads.
+
+      Order matters in one place only: motion.css carries the reduced-motion
+      overrides, so it has to come after the rules they override.
+    -->
+    <link rel="stylesheet" href="style/tokens.css" />
+    <link rel="stylesheet" href="style/fonts.css" />
+    <link rel="stylesheet" href="style/base.css" />
+    <link rel="stylesheet" href="style/clock.css" />
+    <link rel="stylesheet" href="style/phrase.css" />
+    <link rel="stylesheet" href="style/quote.css" />
+    <link rel="stylesheet" href="style/fullscreen.css" />
+    <link rel="stylesheet" href="style/motion.css" />
     <!--
       type="module" implies defer, so the DOM is parsed before main.js runs.
       A module script is required rather than an inline one: the Manifest V3
@@ -19,7 +36,7 @@
 
     <!--
       Each .slot is positioned independently against the viewport height; see
-      the layout block in styles.css. Keeping them as siblings rather than as
+      the layout block in style/base.css. Keeping them as siblings rather than as
       one stacked column is what lets the phrase sit dead centre while the
       quote sits between it and the bottom edge.
     -->
@@ -40,8 +57,8 @@
     <!--
       Fullscreen toggle, parked in the bottom-right corner. The wrapper is not
       decoration: it is the zone the pointer has to enter for the button to fade
-      in, and it is deliberately much larger than the icon. See the fullscreen
-      block in styles.css, which is also where both icons come from.
+      in, and it is deliberately much larger than the icon. See
+      style/fullscreen.css, which is also where both icons come from.
 
       js/fullscreen.js rewrites the label as the state changes; the one here is
       the pre-script default for the same string.

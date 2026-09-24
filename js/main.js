@@ -71,7 +71,7 @@ function init() {
 
   // The corner button. It reads the document's own fullscreen state rather than
   // anything assembled above, so it is wired last and on its own; showing and
-  // hiding the icon is left entirely to styles.css.
+  // hiding the icon is left entirely to style/fullscreen.css.
   initFullscreen(byId("fullscreen"));
 }
 // A type="module" script is deferred, so the DOM is already parsed by the time

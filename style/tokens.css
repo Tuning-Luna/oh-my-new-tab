@@ -1,0 +1,100 @@
+/* ===========================================================================
+ * Tokens — everything you are likely to want to change lives in this file.
+ * ======================================================================== */
+
+:root {
+  /* ---- background ---- */
+
+  /* Background blur radius. Set to 0px to turn the blur off entirely. */
+  --bg-blur: 10px;
+
+  /* Dark scrim drawn over the photo. The bundled shot is a high-contrast
+   * black-and-white frame with very bright areas, and white text is unreadable
+   * on it without this. Set to `transparent` to remove the scrim. */
+  --bg-scrim: rgba(0, 0, 0, 0.38);
+
+  /* Fallback colour painted until the photo finishes decoding, so the page
+   * never flashes white on open. */
+  --bg-base: #101014;
+
+  --fg: #ffffff;
+  --fg-muted: rgba(255, 255, 255, 0.78);
+  --text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+
+  /* ---- type ----
+   * "Segoe UI Variable Display" is the optical size Microsoft ships for large
+   * text on Windows 11; the plain "Segoe UI" faces cover Windows 10 and the
+   * system stack covers everything else.
+   *
+   * The clock deliberately avoids every other proportional face on this
+   * machine. Corbel, Candara, Georgia and Franklin Gothic all lack the `tnum`
+   * OpenType feature, so `font-variant-numeric: tabular-nums` silently does
+   * nothing for them and the clock resizes by ~11-14px whenever a digit
+   * changes. Segoe UI honours it. Verify before swapping this. */
+  --font-clock: "Segoe UI Variable Display", "Segoe UI", system-ui,
+    -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  /* Chinese quotes need a face that actually contains CJK glyphs. A Latin
+   * serif listed first (Georgia, Constantia, Sitka) does not, and the Chinese
+   * is silently substituted from a fallback face instead — which is why this
+   * stack lists real CJK faces only.
+   *
+   * The bundled "Noto Serif CJK SC" goes first; it is a CJK face itself, so it
+   * does not reintroduce that problem. Everything after it is the fallback for
+   * the window before it loads and for the case where it is missing.
+   *
+   * This variable is what scopes the bundled face to the quote. Nothing else
+   * here references it: the clock and the date use --font-clock, the phrase and
+   * everything else use --font-ui. To take the face back off the quote, delete
+   * it from this one list. */
+  --font-quote: "Noto Serif CJK SC", "Microsoft YaHei", "PingFang SC",
+    "Hiragino Sans GB", sans-serif;
+
+  /* ---- motion ----
+   * One curve for everything here that settles into place: the clock and date
+   * rising as the page opens, and a changed digit landing. Sharing it is what
+   * keeps the two from reading as separate effects. */
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Entrance. How long the clock takes to rise into place, how far it travels,
+   * and how long the date waits so the block resolves top-down instead of
+   * arriving as one slab. */
+  --rise-duration: 620ms;
+  --rise-shift: 0.6rem;
+  --rise-stagger: 120ms;
+
+  /* A digit that changes fades back up from --blip-fade while dropping into
+   * place from --blip-shift. `em` so the travel scales with the clock, which
+   * js/fit.js may have shrunk. Set --blip-duration to 0s to turn this off. */
+  --blip-duration: 140ms;
+  --blip-fade: 0.45;
+  --blip-shift: -0.06em;
+
+  /* ---- vertical placement ----
+   * Each slot is centred on its own share of the viewport height, so the three
+   * blocks are positioned independently rather than stacked. The `top` that
+   * uses each one sits with its block: clock.css, phrase.css, quote.css. */
+  --head-y: 25%;
+  --phrase-y: 50%;
+  --quote-y: 75%;
+
+  /* Widest a slot may grow before its text wraps. */
+  --slot-width: min(92vw, 78rem);
+
+  /* ---- fullscreen button ----
+   * The corner the button is revealed from, and the icon inside it. The zone is
+   * the larger of the two by a wide margin and that is its whole point: it is
+   * the area the pointer has to enter, and it reaches into the very corner of
+   * the screen, so the button can be called up by throwing the pointer at that
+   * corner rather than by aiming at a small square. */
+  --fullscreen-zone: 6rem;
+  --fullscreen-icon: 1.75rem;
+
+  /* Distance from the icon to the two screen edges it sits against, and how
+   * long the icon takes to fade in. The fade out has no duration to tune — it
+   * is instant by design; see fullscreen.css. */
+  --fullscreen-inset: 1.5rem;
+  --fullscreen-reveal: 400ms;
+}

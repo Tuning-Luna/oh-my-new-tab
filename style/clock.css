@@ -1,0 +1,90 @@
+/* ===========================================================================
+ * Clock and date
+ * ======================================================================== */
+
+/*
+ * The clock and the date rise into place as the page opens.
+ *
+ * Both sit on the two elements rather than on .slot--head, because .slot
+ * already uses `transform` to centre itself and a keyframe that sets
+ * `transform` would replace that centring instead of composing with it.
+ *
+ * A @keyframes animation rather than a transition driven by @starting-style:
+ * that at-rule is for elements appearing out of `display: none`, and for an
+ * ordinary first render an animation is both simpler and reliably triggered.
+ * js/time.js has swapped the placeholder for a real time by the time this
+ * plays, so the fade covers that swap as well. The keyframe itself is in
+ * motion.css, with the rest of them.
+ */
+.clock,
+.date {
+  animation: rise var(--rise-duration) var(--ease-settle) both;
+}
+
+/* Declared after the rule above, whose `animation` shorthand resets
+ * animation-delay to 0 — so this has to come second to win. */
+.date {
+  animation-delay: var(--rise-stagger);
+}
+
+.slot--head {
+  top: var(--head-y);
+}
+
+.clock {
+  font-family: var(--font-clock);
+  /* Upper bound only — js/fit.js shrinks the clock if it would not fit on one
+   * line, so the rendered size is this value or smaller. */
+  font-size: clamp(4.5rem, 13vw, 9.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  /* Tabular figures give every digit the same width, so the clock does not
+   * jitter sideways as the seconds change. Only honoured by fonts that carry
+   * the `tnum` feature — see --font-clock. */
+  font-variant-numeric: tabular-nums;
+  /* Required by the fitter: without it a clock too wide for the slot wraps
+   * first, and scrollWidth reports the wrapped width instead of the width the
+   * line really wants. */
+  white-space: nowrap;
+  text-shadow: var(--text-shadow);
+}
+
+/* One span per digit, built by js/time.js. `inline-block` is what makes the
+ * transform in `blip` (motion.css) apply at all — a transform has no effect on a
+ * non-replaced inline box. The spans carry no whitespace between them, so the
+ * line they produce is the one plain text would have produced, and the
+ * measurement js/fit.js takes off .clock is unchanged. */
+.clock__digit {
+  display: inline-block;
+}
+
+/* The tenths digit is the one field that cannot carry an animation: it
+ * advances every 100ms, which is both too fast for a transition to settle in
+ * and fast enough that a flash would be seen as one (see the `flash` note in
+ * js/time.js for the full reasoning). Rather than leave it looking like the
+ * digit that was forgotten, it is pushed back — dimmer, so it reads as the
+ * clock's fast lane instead of competing with the digits that do land.
+ *
+ * --fg-muted is the same secondary colour .date and .slot--phrase use. Change
+ * it in tokens.css if you want the tenths adjusted without touching those two. */
+.clock__digit--tenths {
+  color: var(--fg-muted);
+}
+
+/* Added and removed by js/time.js every time a digit changes. The shift is in
+ * em, so it stays proportional to whatever size the fitter settled on. Tenths
+ * never gets this class — see `FIELDS` in js/time.js for why. */
+.clock__digit.is-flash {
+  animation: blip var(--blip-duration) var(--ease-settle);
+}
+
+.date {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-clock);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 350;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  text-shadow: var(--text-shadow);
+}

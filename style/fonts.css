@@ -1,0 +1,40 @@
+/* ===========================================================================
+ * Fonts
+ * ======================================================================== */
+
+/*
+ * Noto Serif CJK SC, used by the quote and by nothing else — see --font-quote,
+ * which is the only thing that names this family.
+ *
+ * This file is a subset, not the face as it ships. Upstream is a 52.8MB
+ * variable OTF; the bundled quotes reach 3,770 distinct characters between
+ * them, and cutting the face down to those plus the whole of GB2312 gives
+ * 4.3MB. That is not a cosmetic saving: the face went from unusable-until-
+ * ~830ms-after-navigation to ~200ms, which is what makes `block` below
+ * affordable. The README carries the command that rebuilds it and the caveat
+ * that goes with it.
+ *
+ * It is a variable font carrying the whole 200..900 weight axis rather than
+ * one instance, so `font-weight` on the element picks the instance. Declaring
+ * the real range here is what keeps the axis reachable: the descriptor
+ * defaults to `normal`, which would pin it. Subsetting kept the axis intact —
+ * measured in Chrome, the same Latin probe advances before and after.
+ *
+ * `format("woff2")` covers the variable case; no second src is listed, because
+ * there is no other copy of the face in the project, and a failure to resolve
+ * falls through the family stack in --font-quote.
+ *
+ * `block`, not `swap`: not painting the fallback at all is the whole point of
+ * the setting here. Measured in Chrome, with the font held back so that
+ * "everything else ready, font still pending" was a stable window, a clipped
+ * screenshot of the quote region was byte-identical to the same region with
+ * the text cleared under `block`, and 25008 bytes heavier under `swap`. So
+ * `swap` really does paint the fallback and `block` really does not. `block`
+ * still gives up after three seconds and shows the fallback anyway.
+ */
+@font-face {
+  font-family: "Noto Serif CJK SC";
+  src: url("../assets/NotoSerifCJKsc-VF-subset.woff2") format("woff2");
+  font-weight: 200 900;
+  font-display: block;
+}

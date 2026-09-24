@@ -1,5 +1,22 @@
 ## 自定义
 
+### 样式
+
+`style/` 下按职责拆成 8 个文件，由 `index.html` 逐个 `<link>` 引入。没有构建步骤所以不打包；也没用 `@import`，那会把请求串行化。
+
+| 文件 | 内容 |
+| --- | --- |
+| `tokens.css` | `:root` 里的全部可调参数，改外观先看这里 |
+| `fonts.css` | 名言字体的 `@font-face` |
+| `base.css` | 重置、页面盒子、`.slot` 的共用定位、背景图 |
+| `clock.css` | 时钟与日期 |
+| `phrase.css` | 短语 |
+| `quote.css` | 名言 |
+| `fullscreen.css` | 右下角全屏按钮 |
+| `motion.css` | 全部 `@keyframes`，以及减少动态效果的覆盖 |
+
+引入顺序只在一处有要求：减少动态效果的规则要覆盖各组件自己的动画，所以 `motion.css` 排在最后。三个 `.slot--*` 的 `top` 各自放在对应组件的文件里（位移百分比仍在 `tokens.css`），这样「短语坐在哪」和「短语长什么样」在同一处。
+
 ### 修改短语
 
 编辑 `data/phrases.json`，它是短语本身的字符串数组。称呼不写进数组，而是由 `js/content.js` 顶部的 `PHRASE_ADDRESSEE` 在渲染时追加：改名字、或改成 `""` 去掉称呼，都只改这一处。
@@ -20,7 +37,7 @@
 
 打开新标签页时画一条名言，之后每 1 分钟自动换下一条；按 `R` 可以立即换一条。周期是 `js/main.js` 顶部的 `QUOTE_ROTATION_MS`，单位毫秒。
 
-自动切换和按 `R` 调的是同一个 `renderQuote`，所以挑选范围和切换动画完全一致（动画在 `styles.css` 的 `.is-swap`）。
+自动切换和按 `R` 调的是同一个 `renderQuote`，所以挑选范围和切换动画完全一致（动画在 `style/quote.css` 的 `.is-swap`）。
 
 定时器每换完一次就重新起算，而不是固定的一分钟一格：按 `R` 得到的是「再显示整整一分钟」，否则在计时快到的时候按 `R`，刚挑中的名言可能几秒后就被换掉。
 
@@ -28,7 +45,7 @@
 
 ### 名言字体
 
-名言用 `assets/NotoSerifCJKsc-VF-subset.woff2` 渲染，页面其余部分不受影响：字体族名只出现在 `styles.css` 顶部的 `@font-face` 与 `--font-quote` 里，而 `--font-quote` 只被 `.quote__content` 和 `.quote__author` 引用。想换回系统字体，把 `--font-quote` 首选的那个名字删掉即可。
+名言用 `assets/NotoSerifCJKsc-VF-subset.woff2` 渲染，页面其余部分不受影响：字体族名只出现在 `style/fonts.css` 的 `@font-face` 与 `style/tokens.css` 的 `--font-quote` 里，而 `--font-quote` 只被 `.quote__content` 和 `.quote__author` 引用。想换回系统字体，把 `--font-quote` 首选的那个名字删掉即可。
 
 这个文件是**子集，不是上游原文件**。上游 `NotoSerifCJKsc-VF.otf` 有 52.8 MB，而四份语料加起来只用到 3770 个不同字符。裁到「语料用字 ∪ GB2312 全表」后是 4.3 MB，字体可用时间从约 830 ms 降到约 200 ms。`font-display` 取 `block` 而非 `swap`，为的是**完全不绘制备用字体**（`swap` 下备用字体是实打实画出来的，实测可截图证实）；代价是字体就绪前名言不可见，所以体积必须先降下来，否则那段时间会很长。
 
@@ -68,9 +85,9 @@ python -m fontTools.subset assets/NotoSerifCJKsc-VF.otf --text-file=/tmp/keep.tx
 
 状态取自 Fullscreen API 的 `document.fullscreenElement`，`js/fullscreen.js` 在 `fullscreenchange` 时把它同步成 `<html>` 上的 `is-fullscreen` 类。因此按 Esc 退出、用浏览器自己的方式退出，图标同样会跟着变——按钮的状态不来自点击记录，而来自文档当前的实际情况。
 
-两个图标文件在 `assets/` 下，但**不是**当图片用的：它们是单色实心路径，`styles.css` 把文件本身当作 mask，再用 `background-color` 上色，颜色因此跟着 `--fg-muted`（与 `.date`、`.slot--phrase` 同一个次级色）走，而不是文件里写死的 `#666666`。想用回那个灰色，把 `.fullscreen__button` 里的两行 mask 换成 `background-image`，并去掉 `background-color`。
+两个图标文件在 `assets/` 下，但**不是**当图片用的：它们是单色实心路径，`style/fullscreen.css` 把文件本身当作 mask，再用 `background-color` 上色，颜色因此跟着 `--fg-muted`（与 `.date`、`.slot--phrase` 同一个次级色）走，而不是文件里写死的 `#666666`。想用回那个灰色，把 `.fullscreen__button` 里的两行 mask 换成 `background-image`，并去掉 `background-color`。
 
-可调项都在 `styles.css` 的 `:root` 里：`--fullscreen-zone` 是鼠标要进入的角落范围，`--fullscreen-icon` 是图标大小，`--fullscreen-inset` 是图标到屏幕两条边的距离，`--fullscreen-reveal` 是淡入时长。淡出没有时长可调，它是立即消失的。
+可调项都在 `style/tokens.css` 的 `:root` 里：`--fullscreen-zone` 是鼠标要进入的角落范围，`--fullscreen-icon` 是图标大小，`--fullscreen-inset` 是图标到屏幕两条边的距离，`--fullscreen-reveal` 是淡入时长。淡出没有时长可调，它是立即消失的。
 
 一个已知边界：按 `F11` 进入的是浏览器自己的全屏，与「某个元素进入全屏」不是一回事——没有元素进入全屏栈，`document.fullscreenElement` 保持 `null`，`fullscreenchange` 也不会触发，所以按钮看不到它，会继续显示「进入全屏」。这个状态没有 API 可查：只能靠视口尺寸去猜（最大化窗口、系统缩放、页面缩放都会让判断出错），或者拦截 F11 按键（漏掉浏览器菜单里的入口），两者都是用一个错的答案换掉一个已知的缺口，因此没有做。
 

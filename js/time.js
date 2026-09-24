@@ -34,7 +34,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
  * field that can afford the animation, so seconds is where it stops.
  *
  * The tenths digits are dimmed instead — see `.clock__digit--tenths` in
- * styles.css. `buildDigits` gives every field a `clock__digit--<name>` hook,
+ * style/clock.css. `buildDigits` gives every field a `clock__digit--<name>` hook,
  * which is the one that rule uses.
  */
 const FIELDS = [
@@ -52,7 +52,7 @@ const FIELDS = [
 /** Literal text between consecutive fields — one fewer than there are fields. */
 const SEPARATORS = [":", ":", "."];
 
-/** Drives the settle animation in `.clock__digit.is-flash`; see styles.css. */
+/** Drives the settle animation in `.clock__digit.is-flash`; see style/clock.css. */
 const FLASH_CLASS = "is-flash";
 
 /** Formats one field of `date` at its declared width, zero-padded. */
@@ -101,7 +101,7 @@ export function formatDate(date) {
  * dropped here, which is what lets the placeholder be any shape it likes.
  *
  * Each digit also carries a `clock__digit--<field>` class. Nothing depends on
- * it except the tenths rule in styles.css; it is derived from the field name
+ * it except the tenths rule in style/clock.css; it is derived from the field name
  * rather than special-cased so that styling a single field stays a CSS-only
  * change.
  */

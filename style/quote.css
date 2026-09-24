@@ -1,0 +1,39 @@
+/* ===========================================================================
+ * Quote
+ * ======================================================================== */
+
+.slot--quote {
+  top: var(--quote-y);
+  margin: 0;
+}
+
+.quote__content {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: clamp(1.3rem, 2.7vw, 2rem);
+  line-height: 1.7;
+  text-wrap: balance;
+  text-shadow: var(--text-shadow);
+}
+
+.quote__author {
+  margin-top: 0.6rem;
+  font-family: var(--font-quote);
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  /* Both the author and the work are shown now, so this line can run to about
+   * 64 characters and wrap on a narrow window. Balance the two lines rather
+   * than leaving a short orphan, the same reason .quote__content uses it. */
+  text-wrap: balance;
+  text-shadow: var(--text-shadow);
+}
+
+/* Added and removed by js/content.js every time a new quote is drawn.
+ * Reuses the digit-settle keyframe, so a swap reads as the same motion the
+ * clock uses — see --blip-* in tokens.css and `blip` in motion.css. `em` keeps
+ * the shift proportional to the font size each line settled on. */
+.quote__content.is-swap,
+.quote__author.is-swap {
+  animation: blip var(--blip-duration) var(--ease-settle);
+}

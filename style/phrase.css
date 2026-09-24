@@ -1,0 +1,20 @@
+/* ===========================================================================
+ * Phrase
+ * ======================================================================== */
+
+/* Its own slot, so positioning and type are one rule here rather than two that
+ * have to be read together. */
+.slot--phrase {
+  top: var(--phrase-y);
+  margin: 0;
+  /* Upper bound only — js/fit.js shrinks any phrase that would not fit on one
+   * line, so the rendered size is this value or smaller. */
+  font-size: clamp(1.75rem, 4.6vw, 5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--fg-muted);
+  /* Required by the fitter: without it the text wraps and scrollWidth reports
+   * the wrapped width, hiding how wide the line really wants to be. */
+  white-space: nowrap;
+  text-shadow: var(--text-shadow);
+}

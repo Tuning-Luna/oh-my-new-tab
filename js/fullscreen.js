@@ -25,7 +25,7 @@
  * later), so no prefixed variants are written.
  */
 
-/** Put on <html> while an element is fullscreen; styles.css swaps the icon on it. */
+/** Put on <html> while an element is fullscreen; style/fullscreen.css swaps the icon on it. */
 const ACTIVE_CLASS = "is-fullscreen";
 
 /**
@@ -42,7 +42,7 @@ const isFullscreen = () => document.fullscreenElement !== null;
  * Wires `buttonEl` to the document's fullscreen state.
  *
  * The button gets no hover handling here: showing and hiding it is a `:hover`
- * rule in styles.css, which is also what makes the hide instant. The document is
+ * rule in style/fullscreen.css, which is also what makes the hide instant. The document is
  * the element put into fullscreen, so that the whole page scales rather than the
  * corner button's own subtree.
  */

@@ -4,7 +4,15 @@
 oh-my-new-tab/
 ├── manifest.json              MV3 清单，通过 chrome_url_overrides.newtab 注册新标签页
 ├── index.html                 页面结构
-├── styles.css                 样式与全部可调参数（见文件顶部 :root 块）
+├── style/                     样式，按职责拆分，由 index.html 逐个 link
+│   ├── tokens.css             :root 里的全部可调参数
+│   ├── fonts.css              名言字体的 @font-face
+│   ├── base.css               重置、页面盒子、.slot 共用定位、背景图
+│   ├── clock.css              时钟与日期
+│   ├── phrase.css             短语
+│   ├── quote.css              名言
+│   ├── fullscreen.css         右下角全屏按钮
+│   └── motion.css             全部 @keyframes 与减少动态效果的覆盖
 ├── js/
 │   ├── main.js                启动入口，装配 DOM
 │   ├── time.js                时钟与日期

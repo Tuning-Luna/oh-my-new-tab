@@ -1,0 +1,61 @@
+/* ===========================================================================
+ * Base
+ * ======================================================================== */
+
+/*
+ * The page shell: the reset, the page box, the background photo, and the slot
+ * mechanism the three content blocks hang off. Each slot's own `top` sits in
+ * the file for the block it positions — clock.css, phrase.css, quote.css.
+ */
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg-base);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg {
+  position: fixed;
+  /* Overscan by twice the blur radius, so the soft transparent fringe that
+   * `filter: blur()` produces at the edges falls outside the viewport instead
+   * of showing as a washed-out border. */
+  inset: calc(-2 * var(--bg-blur));
+  z-index: 0;
+  pointer-events: none;
+
+  /* First layer on top: the scrim. Second layer: the photo. The scrim is a
+   * flat colour, so blurring it changes nothing — it only softens the photo. */
+  background-image: linear-gradient(var(--bg-scrim), var(--bg-scrim)),
+    url("../assets/JSA.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  filter: blur(var(--bg-blur));
+}
+
+.stage {
+  position: relative;
+  /* The slots below are placed with percentages, which resolve against this
+   * box. Keep it a full viewport tall, with a floor so the three slots cannot
+   * collide on a short window — below that the page scrolls instead. */
+  min-height: max(100vh, 40rem);
+}
+
+.slot {
+  position: absolute;
+  left: 50%;
+  /* Centres the block on the point given by its `top`, so `top` names the
+   * centre of the block rather than its top edge. */
+  transform: translate(-50%, -50%);
+  width: var(--slot-width);
+  text-align: center;
+}

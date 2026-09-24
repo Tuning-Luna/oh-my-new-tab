@@ -1,0 +1,71 @@
+/* ===========================================================================
+ * Motion
+ * ======================================================================== */
+
+/*
+ * The page's keyframes, in one file for two reasons: `blip` is shared — the
+ * clock's digits and the quote swap both settle with it — and the
+ * reduced-motion block below has to come after the rules it overrides, which is
+ * why this file is linked last. The component files name these animations; none
+ * of them defines its own.
+ */
+
+/* The clock and date rising into place as the page opens; see clock.css. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise-shift));
+  }
+}
+
+/* A changing digit dropping into place, and a new quote arriving; see
+ * clock.css and quote.css. */
+@keyframes blip {
+  from {
+    opacity: var(--blip-fade);
+    transform: translateY(var(--blip-shift));
+  }
+}
+
+/*
+ * The OS setting asks for less movement, not for no visual change at all:
+ * MDN's accessibility guidance and WCAG's "Animation from Interactions" both
+ * keep fades while dropping the travel that vestibular sensitivity reacts to.
+ * So the entrance keeps its fade and loses its rise, and the digit flash —
+ * pure movement, and the only animation here that fires again and again for as
+ * long as the page is open — is dropped entirely.
+ *
+ * The clock's fade is also the one piece of motion here doing real work:
+ * index.html ships a "--:--:--.-" placeholder that the first frame replaces,
+ * and the fade is what covers that swap.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .clock,
+  .date {
+    animation: fade var(--rise-duration) ease-out both;
+  }
+
+  /* The shorthand above resets animation-delay, so the stagger has to be
+   * restored here rather than inherited from clock.css. */
+  .date {
+    animation-delay: var(--rise-stagger);
+  }
+
+  .clock__digit.is-flash {
+    animation: none;
+  }
+
+  /* The quote swap is the same pure-movement keyframe as the digit flash, so
+   * it goes the same way under reduced motion: dropped rather than faded. */
+  .quote__content.is-swap,
+  .quote__author.is-swap {
+    animation: none;
+  }
+}
+
+/* The entrance without its travel; see the block above. */
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

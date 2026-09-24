@@ -109,7 +109,7 @@ function formatAttribution(quote) {
   return `${author}${ATTRIBUTION_SEPARATOR}${work}`;
 }
 
-/** Restarts the swap animation in `.is-swap`; see styles.css. */
+/** Restarts the swap animation in `.is-swap`; see style/quote.css. */
 const SWAP_CLASS = "is-swap";
 
 /**

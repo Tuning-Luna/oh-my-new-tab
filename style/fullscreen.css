@@ -1,0 +1,82 @@
+/* ===========================================================================
+ * Fullscreen button
+ * ======================================================================== */
+
+/*
+ * Parked in the bottom-right corner and invisible until the pointer is in that
+ * corner. The page is a backdrop for a glance — a clock, a phrase, a quote, and
+ * nothing to click — so a control left on screen would be the one thing in it
+ * that is not content.
+ *
+ * `.fullscreen` is therefore not the button but the zone the pointer has to
+ * enter, sized by --fullscreen-zone, which is several times the icon. The button
+ * is pushed into the far corner of that zone by the padding, which doubles as
+ * the icon's distance from the two screen edges.
+ */
+.fullscreen {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: var(--fullscreen-zone);
+  height: var(--fullscreen-zone);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: var(--fullscreen-inset);
+}
+
+/*
+ * The two icons are single flat-filled paths on a transparent ground, which is
+ * the shape a mask wants — so they are used as one, and the button is painted
+ * with background-color instead. That is what puts the colour under this file's
+ * control: --fg-muted, the same secondary colour .date and .slot--phrase use, in
+ * place of the #666666 fill baked into both files. Change it in tokens.css to
+ * change this with them; to use that grey as it ships, swap the mask lines for a
+ * background-image of the file and drop background-color.
+ *
+ * Both spellings are written because the shorthand is newer unprefixed than
+ * prefixed. It matters here: an unrecognised mask declaration is not inert — the
+ * background-color paints on unmasked and the corner shows a solid square.
+ */
+.fullscreen__button {
+  width: var(--fullscreen-icon);
+  height: var(--fullscreen-icon);
+  padding: 0;
+  border: 0;
+  background-color: var(--fg-muted);
+  -webkit-mask: url("../assets/fullscreen-expand.svg") center / contain no-repeat;
+  mask: url("../assets/fullscreen-expand.svg") center / contain no-repeat;
+  cursor: pointer;
+
+  /* Hidden, and hiding costs no time. A transition is read from the state being
+   * entered, so only the rule below needs a duration: the pointer leaving the
+   * zone applies this rule instead, and the icon goes at once. */
+  opacity: 0;
+  transition: none;
+}
+
+/* Put on <html> by js/fullscreen.js out of the document's own fullscreen state,
+ * so this icon always shows what the next click does. */
+:root.is-fullscreen .fullscreen__button {
+  -webkit-mask: url("../assets/fullscreen-shrink.svg") center / contain no-repeat;
+  mask: url("../assets/fullscreen-shrink.svg") center / contain no-repeat;
+}
+
+/*
+ * Revealed by the pointer anywhere in the zone, and by keyboard focus: the button
+ * is in the tab order whether or not it is painted, so without the second
+ * selector a Tab would land on something invisible.
+ *
+ * `:focus-visible` rather than `:focus` on the button or `:focus-within` on the
+ * zone, because a click focuses a button in Chrome — either of those would hold
+ * the icon on screen after a click until focus moved elsewhere, which is the
+ * instant hide above undone.
+ *
+ * The reveal is a fade, so the reduced-motion block in motion.css leaves it
+ * alone: that block drops movement, and there is none here.
+ */
+.fullscreen:hover .fullscreen__button,
+.fullscreen__button:focus-visible {
+  opacity: 1;
+  transition: opacity var(--fullscreen-reveal) var(--ease-settle);
+}
