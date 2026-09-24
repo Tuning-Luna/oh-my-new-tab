@@ -46,7 +46,7 @@ const resolveResource = (path) =>
   globalThis.chrome?.runtime?.getURL ? chrome.runtime.getURL(path) : path;
 
 /** Reads a packaged JSON file and asserts that it holds an array. */
-async function loadJsonArray(path) {
+async function readJsonArray(path) {
   const response = await fetch(resolveResource(path));
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} ${response.statusText}`);
@@ -59,7 +59,45 @@ async function loadJsonArray(path) {
   return data;
 }
 
-/** Picks one phrase and writes it into `el`. A failure leaves `el` blank. */
+/**
+ * The same, but each file is read at most once per session. Every draw picks a
+ * file — the rotation, the R key and a click all come through here — and the
+ * largest is 770 KB, so the read and its parse are kept rather than repeated.
+ * Only successful reads are cached: a failure is dropped, so the next draw
+ * retries it instead of replaying the error.
+ */
+const fileCache = new Map();
+
+function loadJsonArray(path) {
+  const cached = fileCache.get(path);
+  if (cached) return cached;
+
+  const pending = readJsonArray(path).catch((error) => {
+    fileCache.delete(path);
+    throw error;
+  });
+  fileCache.set(path, pending);
+  return pending;
+}
+
+/**
+ * Restarts the swap animation in `.is-swap`; the rules are in style/phrase.css
+ * and style/quote.css.
+ */
+const SWAP_CLASS = "is-swap";
+
+/**
+ * Restarts the swap animation, the same way flash() in time.js restarts a digit:
+ * a class that is already there has nothing to change, so the removal is forced
+ * through by a layout read before the class goes back on.
+ */
+function animateSwap(el) {
+  el.classList.remove(SWAP_CLASS);
+  void el.offsetWidth;
+  el.classList.add(SWAP_CLASS);
+}
+
+/** Picks one phrase and writes it into `el`, the phrase's text span. */
 export async function renderPhrase(el) {
   try {
     const phrases = await loadJsonArray(PHRASES_PATH);
@@ -71,6 +109,9 @@ export async function renderPhrase(el) {
     el.textContent = PHRASE_ADDRESSEE
       ? `${phrase}, ${PHRASE_ADDRESSEE}`
       : phrase;
+
+    // Written first, so the new text is on screen before the settle plays.
+    animateSwap(el);
   } catch (error) {
     console.error(`[newtab] Could not load ${PHRASES_PATH}:`, error);
   }
@@ -92,20 +133,6 @@ function formatAttribution(quote) {
   if (!author) return work;
   if (!work || author === work) return author;
   return `${author}${ATTRIBUTION_SEPARATOR}${work}`;
-}
-
-/** Restarts the swap animation in `.is-swap`; see style/quote.css. */
-const SWAP_CLASS = "is-swap";
-
-/**
- * Restarts the swap animation, the same way flash() in time.js restarts a digit:
- * a class that is already there has nothing to change, so the removal is forced
- * through by a layout read before the class goes back on.
- */
-function animateSwap(el) {
-  el.classList.remove(SWAP_CLASS);
-  void el.offsetWidth;
-  el.classList.add(SWAP_CLASS);
 }
 
 /** Picks one quote and writes its hitokoto and attribution into the given elements. */

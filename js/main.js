@@ -27,14 +27,22 @@ function init() {
   fitToOneLine(clockEl);
 
   const phraseEl = byId("phrase");
-  renderPhrase(phraseEl).then(() => fitToOneLine(phraseEl));
+  const phraseTextEl = byId("phrase-text");
+
+  // Clicking the phrase draws another one. The slot box around the text is far
+  // wider than the words, so the listener goes on the span; see index.html.
+  const drawPhrase = () =>
+    renderPhrase(phraseTextEl).then(() => fitToOneLine(phraseEl));
+
+  drawPhrase();
+  phraseTextEl.addEventListener("click", drawPhrase);
 
   const quoteContentEl = byId("quote-content");
   const quoteAuthorEl = byId("quote-author");
 
   // One timer, re-armed by every swap rather than a setInterval: a swap is
-  // reached two ways, the rotation and the R key, and both come through here, so
-  // a hand-picked quote gets a full turn on screen.
+  // reached three ways — the rotation, the R key and a click — and all of them
+  // come through here, so a hand-picked quote gets a full turn on screen.
   let quoteTimer = 0;
   const swapQuote = () => {
     clearTimeout(quoteTimer);
@@ -47,6 +55,12 @@ function init() {
 
   // Draws the first quote immediately, which is also what starts the rotation.
   swapQuote();
+
+  // Clicking either line draws another quote and restarts the rotation, exactly
+  // as R does. The listener goes on the two lines rather than on the slot, which
+  // is far wider than the text; see style/quote.css.
+  quoteContentEl.addEventListener("click", swapQuote);
+  quoteAuthorEl.addEventListener("click", swapQuote);
 
   // Press R to load another random quote now, and restart the rotation.
   addEventListener("keydown", (event) => {

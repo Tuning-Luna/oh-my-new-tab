@@ -29,6 +29,25 @@
   text-shadow: var(--text-shadow);
 }
 
+/* Each of the two lines is a click target that draws another quote, so each is
+ * sized to its own text rather than to the slot. The slot is 92vw wide, and a
+ * short quote inside it is mostly empty band, which would take clicks aimed at
+ * nothing — the listener is on these two elements, not on the slot.
+ *
+ * This cannot be done by sizing the slot instead: the slot is absolutely
+ * positioned at `left: 50%`, so its available width is half the stage rather
+ * than the slot width, and a long quote would wrap early on a narrow window.
+ * Here the containing block is the slot, so the clamp is the slot width again,
+ * and a long quote wraps where it did. `margin-inline: auto` centres a short
+ * one, which is what the slot's `text-align` did for it; the two rules above
+ * come first so their `margin` shorthands cannot reset it. */
+.quote__content,
+.quote__author {
+  width: fit-content;
+  margin-inline: auto;
+  cursor: pointer;
+}
+
 /* Added and removed by js/content.js every time a new quote is drawn.
  * Reuses the digit-settle keyframe, so a swap reads as the same motion the
  * clock uses — see --blip-* in tokens.css and `blip` in motion.css. `em` keeps

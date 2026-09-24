@@ -56,9 +56,11 @@
   }
 
   /* The quote swap is the same pure-movement keyframe as the digit flash, so
-   * it goes the same way under reduced motion: dropped rather than faded. */
+   * it goes the same way under reduced motion: dropped rather than faded. The
+   * phrase swap is that keyframe too. */
   .quote__content.is-swap,
-  .quote__author.is-swap {
+  .quote__author.is-swap,
+  .phrase__text.is-swap {
     animation: none;
   }
 }

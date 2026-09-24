@@ -46,8 +46,18 @@
         <p class="date" id="date"></p>
       </div>
 
-      <p class="slot slot--phrase" id="phrase"></p>
+      <!--
+        The span is the phrase's text as against the slot box around it. The box
+        keeps the slot's full width because js/fit.js measures it to decide how
+        far to shrink; the span is what the eye reads, so it is what carries the
+        swap animation and what takes the click that draws another phrase —
+        neither of which is true of the full-width box.
+      -->
+      <p class="slot slot--phrase" id="phrase"><span class="phrase__text" id="phrase-text"></span></p>
 
+      <!-- Clicking either line draws another quote. Each line is sized to its
+           own text rather than to the slot, so a click has to land on the
+           words; see style/quote.css. -->
       <figure class="slot slot--quote">
         <blockquote class="quote__content" id="quote-content"></blockquote>
         <figcaption class="quote__author" id="quote-author"></figcaption>

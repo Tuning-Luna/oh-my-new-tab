@@ -18,3 +18,22 @@
   white-space: nowrap;
   text-shadow: var(--text-shadow);
 }
+
+/* The text itself, as against the slot box around it. The box has to keep the
+ * slot's full width for the fitter to measure against, which would make it a
+ * wide, mostly empty click target; this span is only as wide as the words, so it
+ * is both the click target and the thing the swap animation moves.
+ *
+ * `inline-block` because a transform does not apply to a non-replaced inline
+ * box, and `blip` moves one. The span then measures and sits exactly as the bare
+ * text did. */
+.phrase__text {
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Added and removed by js/content.js on every draw. Reuses the keyframe the
+ * clock's digits and the quote swap settle with — see `blip` in motion.css. */
+.phrase__text.is-swap {
+  animation: blip var(--blip-duration) var(--ease-settle);
+}
