@@ -3,10 +3,9 @@
 /**
  * Shrinks an element's text until it fits on a single line.
  *
- * Text width is proportional to font size, so one measurement is enough to
- * compute the size that fits exactly: measure at the size the stylesheet asks
- * for, then scale by the ratio of available to needed width. No loop, no
- * binary search.
+ * Text width is proportional to font size, so one measurement is enough:
+ * measure at the size the stylesheet asks for, then scale by the ratio of
+ * available to needed width. No loop, no binary search.
  *
  * The element must be `white-space: nowrap`. Otherwise the text wraps first
  * and `scrollWidth` reports the wrapped width rather than the width the line

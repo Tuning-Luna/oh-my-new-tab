@@ -32,23 +32,20 @@ function init() {
   const quoteContentEl = byId("quote-content");
   const quoteAuthorEl = byId("quote-author");
 
-  // One timer, re-armed by every swap, rather than a setInterval. A swap is
-  // reached two ways — the rotation and the R key — and both go through here,
-  // so a hand-picked quote gets a full turn on screen instead of being replaced
-  // seconds later by a tick that was already due.
+  // One timer, re-armed by every swap rather than a setInterval: a swap is
+  // reached two ways, the rotation and the R key, and both come through here, so
+  // a hand-picked quote gets a full turn on screen.
   let quoteTimer = 0;
   const swapQuote = () => {
     clearTimeout(quoteTimer);
     quoteTimer = setTimeout(swapQuote, QUOTE_ROTATION_MS);
 
-    // Not awaited: renderQuote already reports its own failures, and the next
-    // swap is booked above rather than from the load's completion, so a slow
-    // read cannot push the cadence out.
+    // Not awaited: renderQuote reports its own failures, and the next swap is
+    // booked above, so a slow read cannot push the cadence out.
     renderQuote(quoteContentEl, quoteAuthorEl);
   };
 
-  // Draws the first quote immediately — and starts the rotation, which is why
-  // the initial draw is not a separate call.
+  // Draws the first quote immediately, which is also what starts the rotation.
   swapQuote();
 
   // Press R to load another random quote now, and restart the rotation.
@@ -69,9 +66,8 @@ function init() {
     });
   });
 
-  // The corner button. It reads the document's own fullscreen state rather than
-  // anything assembled above, so it is wired last and on its own; showing and
-  // hiding the icon is left entirely to style/fullscreen.css.
+  // The corner button reads the document's own fullscreen state rather than
+  // anything assembled above, so it is wired last and on its own.
   initFullscreen(byId("fullscreen"));
 }
 // A type="module" script is deferred, so the DOM is already parsed by the time
