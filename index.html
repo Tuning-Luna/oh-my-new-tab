@@ -36,5 +36,23 @@
         <figcaption class="quote__author" id="quote-author"></figcaption>
       </figure>
     </main>
+
+    <!--
+      Fullscreen toggle, parked in the bottom-right corner. The wrapper is not
+      decoration: it is the zone the pointer has to enter for the button to fade
+      in, and it is deliberately much larger than the icon. See the fullscreen
+      block in styles.css, which is also where both icons come from.
+
+      js/fullscreen.js rewrites the label as the state changes; the one here is
+      the pre-script default for the same string.
+    -->
+    <div class="fullscreen">
+      <button
+        class="fullscreen__button"
+        id="fullscreen"
+        type="button"
+        aria-label="Enter fullscreen"
+      ></button>
+    </div>
   </body>
 </html>

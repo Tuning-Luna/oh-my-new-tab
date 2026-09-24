@@ -9,7 +9,8 @@ oh-my-new-tab/
 │   ├── main.js                启动入口，装配 DOM
 │   ├── time.js                时钟与日期
 │   ├── content.js             随机短语与随机名言
-│   └── fit.js                 短语单行自适应
+│   ├── fit.js                 短语单行自适应
+│   └── fullscreen.js          右下角全屏按钮
 ├── data/
 │   ├── phrases.json           短语，字符串数组
 │   ├── anime-quotes.json      动画语料，1465 条，约 560 KB
@@ -19,6 +20,8 @@ oh-my-new-tab/
 └── assets/
     ├── JSA.png                            背景图
     ├── favicon.svg                        标签页图标
+    ├── fullscreen-expand.svg              全屏按钮图标，未全屏时显示
+    ├── fullscreen-shrink.svg              全屏按钮图标，全屏时显示
     ├── NotoSerifCJKsc-VF-subset.woff2     名言字体，Noto Serif CJK SC 的可变字体子集，约 4.3 MB
     └── NotoSerifCJKsc-OFL.txt             该字体的 SIL OFL 1.1 许可证与版权声明
 ```

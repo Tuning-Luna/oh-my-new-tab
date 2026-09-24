@@ -3,6 +3,7 @@
 import { startClock } from "./time.js";
 import { renderPhrase, renderQuote } from "./content.js";
 import { fitToOneLine } from "./fit.js";
+import { initFullscreen } from "./fullscreen.js";
 
 /** How long one quote stays on screen before the next one is drawn, in ms. */
 const QUOTE_ROTATION_MS = 60_000;
@@ -67,6 +68,11 @@ function init() {
       fitToOneLine(phraseEl);
     });
   });
+
+  // The corner button. It reads the document's own fullscreen state rather than
+  // anything assembled above, so it is wired last and on its own; showing and
+  // hiding the icon is left entirely to styles.css.
+  initFullscreen(byId("fullscreen"));
 }
 // A type="module" script is deferred, so the DOM is already parsed by the time
 // this runs. The readyState check keeps the behaviour correct either way.

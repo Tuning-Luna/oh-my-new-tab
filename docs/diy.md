@@ -62,3 +62,17 @@ python -m fontTools.subset assets/NotoSerifCJKsc-VF.otf --text-file=/tmp/keep.tx
 
 替换 `assets/favicon.svg`，或在 `index.html` 中修改 `<link rel="icon">` 的 `href`。当前图标是 1024×1024 的方形图标，PNG 与 SVG 都可用；写 `type="image/svg+xml"` 时需确保文件确为 SVG。
 
+### 右下角全屏按钮
+
+平时不显示。鼠标移进右下角后图标淡入，点击进入全屏；全屏时在同一位置再点一次退出，图标也换成退出用的那个。显示范围远大于图标本身，为的是不用瞄准，所以那一块区域的点击也会被它接住。
+
+状态取自 Fullscreen API 的 `document.fullscreenElement`，`js/fullscreen.js` 在 `fullscreenchange` 时把它同步成 `<html>` 上的 `is-fullscreen` 类。因此按 Esc 退出、用浏览器自己的方式退出，图标同样会跟着变——按钮的状态不来自点击记录，而来自文档当前的实际情况。
+
+两个图标文件在 `assets/` 下，但**不是**当图片用的：它们是单色实心路径，`styles.css` 把文件本身当作 mask，再用 `background-color` 上色，颜色因此跟着 `--fg-muted`（与 `.date`、`.slot--phrase` 同一个次级色）走，而不是文件里写死的 `#666666`。想用回那个灰色，把 `.fullscreen__button` 里的两行 mask 换成 `background-image`，并去掉 `background-color`。
+
+可调项都在 `styles.css` 的 `:root` 里：`--fullscreen-zone` 是鼠标要进入的角落范围，`--fullscreen-icon` 是图标大小，`--fullscreen-inset` 是图标到屏幕两条边的距离，`--fullscreen-reveal` 是淡入时长。淡出没有时长可调，它是立即消失的。
+
+一个已知边界：按 `F11` 进入的是浏览器自己的全屏，与「某个元素进入全屏」不是一回事——没有元素进入全屏栈，`document.fullscreenElement` 保持 `null`，`fullscreenchange` 也不会触发，所以按钮看不到它，会继续显示「进入全屏」。这个状态没有 API 可查：只能靠视口尺寸去猜（最大化窗口、系统缩放、页面缩放都会让判断出错），或者拦截 F11 按键（漏掉浏览器菜单里的入口），两者都是用一个错的答案换掉一个已知的缺口，因此没有做。
+
+要彻底去掉这个按钮，`index.html` 里的 `<div class="fullscreen">` 整块与 `js/main.js` 末尾的 `initFullscreen(byId("fullscreen"))` 要一起删——`byId` 在元素缺失时会抛错。
+
